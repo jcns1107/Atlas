@@ -1,18 +1,16 @@
-"""Schemas for the chat endpoint."""
+"""Chat request/response models — YOUR job to design (GUIDE.md, Phase 1).
+
+Pydantic models validate the JSON coming from the browser, so your route
+handlers receive typed, checked data instead of raw dicts. If a request is
+malformed, FastAPI rejects it for you with a clear error.
+
+What you'll likely need:
+  - A Message     : role ("system" | "user" | "assistant") + content (str).
+  - A ChatRequest : a list of messages, an optional model name, a stream flag.
+
+Define them below with pydantic's BaseModel.
+"""
 
 from __future__ import annotations
 
-from typing import Literal
-
-from pydantic import BaseModel
-
-
-class Message(BaseModel):
-    role: Literal["system", "user", "assistant"]
-    content: str
-
-
-class ChatRequest(BaseModel):
-    messages: list[Message]
-    model: str | None = None          # falls back to OLLAMA_DEFAULT_MODEL
-    stream: bool = True
+# TODO: define your Message and ChatRequest models.

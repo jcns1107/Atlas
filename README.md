@@ -11,9 +11,11 @@ plug in optionally.
 Inspired by PewDiePie's **Odysseus** project — a personal, local AI you fully
 own and shape yourself.
 
-> **Status: 🚧 early scaffold.** The chat skeleton runs today; the rest is a
-> guided build. See **[GUIDE.md](GUIDE.md)** for the step-by-step plan and
-> **[docs/ROADMAP.md](docs/ROADMAP.md)** for progress.
+> **Status: 🚧 learning scaffold.** This repo gives you the structure, the docs,
+> and a runnable app shell — but the feature code is intentionally left as
+> **guided stubs** for *you* to implement. Each stub explains what to build and
+> why. Follow **[GUIDE.md](GUIDE.md)** phase by phase; track progress in
+> **[docs/ROADMAP.md](docs/ROADMAP.md)**.
 
 ---
 
@@ -21,39 +23,39 @@ own and shape yourself.
 
 | Feature | What it does | Phase |
 | --- | --- | --- |
-| 💬 **Chat with your agents** | Talk (and eventually speak) with any agent you create | ✅ skeleton |
+| 💬 **Chat with your agents** | Talk (and eventually speak) with any agent you create | 1 |
 | 🤖 **Custom agents** | Model + persona + tools + memory, defined as data | 5 |
 | 🧰 **Tools & MCP** | Built-in bash/files/web/memory + any MCP server, toggleable per tool | 4, 7 |
-| 🖥️ **Hardware-aware models** | Recommends models that fit your RAM/VRAM | ✅ skeleton |
+| 🖥️ **Hardware-aware models** | Recommends models that fit your RAM/VRAM | 3 |
 | 📧 **Email assistant** | Summaries, style-matched drafts, auto-tagging & spam triage over IMAP/SMTP | 8 |
 | 🔎 **Deep Research** | Multi-step runs that gather, read & synthesize sources into a report | 9 |
 | 🧠 **Memory** | Durable facts recalled across sessions | 6 |
 | 🌱 **Self-evolving Skills** | The assistant writes, refines & reuses its own skills | 10 |
 | 🎭 **Characters** | Personas with voice & backstory you can design | 11 |
 | 🔌 **API models too** | Use Claude/OpenAI alongside local models | 12 |
-| 🎨 **Local web UI** | Plain HTML/CSS/JS you fully control | ✅ skeleton |
+| 🎨 **Local web UI** | Plain HTML/CSS/JS you fully control | 1 |
 
 ---
 
-## 🚀 Quick start
+## 🚀 Get started
 
-**Prerequisites:** Python 3.11+, and [Ollama](https://ollama.com/download) installed.
+**Prerequisites:** Python 3.11+, and [Ollama](https://ollama.com/download).
 
 ```powershell
-# 1. From the project root, run one-time setup (creates venv, installs deps, makes .env)
+# 1. One-time setup (creates venv, installs deps, makes .env)
 ./scripts/setup.ps1
 
-# 2. Install a model (in a separate terminal, after installing Ollama)
-ollama pull llama3.2
-
-# 3. Start Atlas
+# 2. Boot the app shell — a health check + an empty UI you'll build out
 python run.py
-
-# 4. Open the UI
-#    http://127.0.0.1:8000
+#    -> http://127.0.0.1:8000   (interactive API docs at /docs)
 ```
 
-Don't want the script? Manual version:
+That boots today, but the features aren't built yet — **that's the point.** Open
+**[GUIDE.md](GUIDE.md)**, start at **Phase 0**, then implement **Phase 1** (your
+first real chat) into the guided stubs. You'll `ollama pull llama3.2` when Phase 1
+tells you to.
+
+Prefer manual setup over the script?
 
 ```powershell
 python -m venv .venv

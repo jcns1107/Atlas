@@ -3,17 +3,21 @@
 A living checklist. Tick items as you finish them. Each phase maps to a section
 in [GUIDE.md](../GUIDE.md).
 
-## ✅ Phase 0 — Scaffold (done)
+## ✅ Phase 0 — Scaffold (done for you)
 - [x] Project structure, git, `.gitignore`, `.env.example`
-- [x] FastAPI app serving the frontend
-- [x] Ollama provider + streaming `/api/chat`
-- [x] Starter chat UI (HTML/CSS/JS)
-- [x] Hardware profile + model recommendation endpoint
-- [x] Health check + first tests
+- [x] Docs: README, CLAUDE.md, ARCHITECTURE, ROADMAP, GUIDE
+- [x] Runnable app shell: boots, serves the frontend, `/api/health`, `/docs`
+- [x] A guided stub for every feature (what to build + why, no implementation)
 
-## ⬜ Phase 1 — Foundations
-- [ ] Install Ollama, pull a model, confirm chat works end-to-end
-- [ ] Comfortable with venv, FastAPI routes, the request lifecycle
+Everything below is **yours to implement**.
+
+## ⬜ Phase 1 — Your first chat (the skeleton)
+- [ ] Install Ollama, pull a model
+- [ ] Design the request schema (`backend/schemas/chat.py`)
+- [ ] Define the provider interface (`backend/core/llm/base.py`)
+- [ ] Implement the Ollama provider (`backend/core/llm/ollama_provider.py`)
+- [ ] Implement `POST /api/chat` (stream the reply) + `GET /api/models`
+- [ ] Build the minimal chat UI and wire it up
 
 ## ⬜ Phase 2 — Better chat
 - [ ] Multiple conversations, saved to `data/`
@@ -21,6 +25,7 @@ in [GUIDE.md](../GUIDE.md).
 - [ ] Markdown rendering in the UI
 
 ## ⬜ Phase 3 — Model management
+- [ ] Implement the hardware recommender + `/api/models/recommend`
 - [ ] Surface recommendations in the UI
 - [ ] Pull/delete models from the UI (`/api/pull` proxy to Ollama)
 

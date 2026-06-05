@@ -14,6 +14,18 @@ The project is being built **as a learning journey** — see [GUIDE.md](GUIDE.md
 Prefer clear, well-commented, beginner-readable code over clever abstractions.
 The owner is learning; explain non-obvious choices in comments.
 
+## ⚠️ Important: this is a learn-by-doing repo
+
+The owner is building Atlas **themselves, to learn**. Almost all feature code is
+intentionally left as **guided stubs** — a docstring saying what to build and
+why, with a `TODO` and no implementation. Only the app shell (`config.py`,
+`main.py`, the `/api/health` route, `run.py`) is implemented.
+
+**Do not implement the stubs unless the owner explicitly asks you to.** When they
+ask for help, default to *explaining* concepts, *reviewing* their code, pointing
+at the right docs/APIs, and unblocking specific bugs — not writing the feature
+for them. If a request is ambiguous, ask whether they want guidance or code.
+
 ## Tech stack
 
 - **Backend:** Python 3.11+, FastAPI, httpx, pydantic / pydantic-settings.

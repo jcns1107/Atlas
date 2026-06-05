@@ -7,35 +7,19 @@
     <link rel="stylesheet" href="/static/css/styles.css" />
   </head>
   <body>
-    <div class="app">
-      <aside class="sidebar">
-        <h1 class="logo">🧭 Atlas</h1>
-        <nav>
-          <a class="nav-item active" href="#">Chat</a>
-          <a class="nav-item" href="#" title="Coming soon">Agents</a>
-          <a class="nav-item" href="#" title="Coming soon">Tools &amp; MCP</a>
-          <a class="nav-item" href="#" title="Coming soon">Email</a>
-          <a class="nav-item" href="#" title="Coming soon">Research</a>
-          <a class="nav-item" href="#" title="Coming soon">Characters</a>
-        </nav>
-        <div class="model-picker">
-          <label for="model">Model</label>
-          <select id="model"></select>
-        </div>
-      </aside>
+    <!--
+      This is YOUR UI to design (GUIDE.md, Phases 1-2).
 
-      <main class="chat">
-        <div id="messages" class="messages"></div>
-        <form id="composer" class="composer">
-          <textarea
-            id="input"
-            placeholder="Message your local model…  (Ollama must be running)"
-            rows="1"
-          ></textarea>
-          <button type="submit">Send</button>
-        </form>
-      </main>
-    </div>
+      A chat interface usually needs:
+        - a scrollable area to show the conversation
+        - a text input + a send button
+        - a dropdown to pick the model
+
+      Build the markup here, style it in css/styles.css, and wire it to the
+      backend in js/app.js (which calls GET /api/models and POST /api/chat).
+    -->
+    <h1>🧭 Atlas</h1>
+    <p>Start building your interface here.</p>
 
     <script src="/static/js/app.js"></script>
   </body>

@@ -1,32 +1,33 @@
-"""Chat endpoint — streams a model's reply token-by-token via SSE.
+"""Chat endpoint — YOUR job to implement (GUIDE.md, Phase 1).
 
-This is the heart of the starter skeleton. POST a list of messages and you
-get back a `text/event-stream` you can render live in the browser.
+Goal: accept a list of chat messages, send them to a model through your LLM
+provider, and stream the reply back to the browser so it appears token by token.
+
+What to build here:
+  - A `POST /api/chat` route.
+  - Read and validate the request body (design the schema in
+    backend/schemas/chat.py).
+  - Call your provider's streaming chat method (backend/core/llm/).
+  - Return the chunks as a live stream.
+
+Why stream? Local models generate one token at a time; streaming makes the UI
+feel instant instead of waiting for the whole answer. Server-Sent Events
+(media_type "text/event-stream") is the simplest transport the browser can read
+incrementally — each frame looks like  `data: <text>\n\n`.
+
+Keep this route THIN: parse the request, call core, stream the result. All the
+real model logic belongs in core/llm/, not here.
+
+Right now it returns 501 so the app still boots and the route shows up in /docs.
 """
 
 from __future__ import annotations
 
-from fastapi import APIRouter
-from fastapi.responses import StreamingResponse
-
-from backend.core.llm import OllamaProvider
-from backend.schemas.chat import ChatRequest
+from fastapi import APIRouter, HTTPException
 
 router = APIRouter(tags=["chat"])
-_provider = OllamaProvider()
 
 
 @router.post("/chat")
-async def chat(req: ChatRequest) -> StreamingResponse:
-    messages = [m.model_dump() for m in req.messages]
-
-    async def event_stream():
-        try:
-            async for chunk in _provider.stream_chat(messages, model=req.model):
-                # Server-Sent Events format: "data: <payload>\n\n"
-                yield f"data: {chunk}\n\n"
-        except Exception as exc:  # surface connection errors to the UI
-            yield f"event: error\ndata: {exc}\n\n"
-        yield "event: done\ndata: [DONE]\n\n"
-
-    return StreamingResponse(event_stream(), media_type="text/event-stream")
+async def chat():
+    raise HTTPException(status_code=501, detail="Not implemented yet — see GUIDE.md Phase 1.")

@@ -1,54 +1,27 @@
-"""Talk to a locally running Ollama server over its REST API.
+"""Ollama provider — YOUR job to implement (GUIDE.md, Phase 1).
 
-Ollama exposes a simple HTTP API on http://localhost:11434. We use httpx
-directly (rather than the `ollama` python package) so you can see exactly
-what request is being made — useful while you're learning.
+Talk to a locally running Ollama server (default http://localhost:11434) and
+implement the interface you defined in base.py.
+
+Ollama's REST API (the two endpoints you need first):
+  - POST /api/chat  : a chat completion. With {"stream": true} the response is
+                      newline-delimited JSON — each line is a chunk that holds
+                      message.content (the next piece of text) and a `done` flag.
+  - GET  /api/tags  : the models the user has pulled.
+
+What to implement:
+  - list_models()                  -> the installed model names.
+  - stream_chat(messages, model)   -> yield each text chunk as it arrives.
+
+Hints:
+  - Use `httpx.AsyncClient`. For streaming, `client.stream("POST", url, json=...)`
+    plus `async for line in resp.aiter_lines()`.
+  - Each streamed line is JSON — parse it, pull out the text, `yield` it.
+  - Read OLLAMA_BASE_URL / OLLAMA_DEFAULT_MODEL from `backend.config.settings`.
+  - Before coding, poke the API by hand to see the response shape, e.g.:
+      curl http://localhost:11434/api/chat -d '{"model":"llama3.2","messages":[{"role":"user","content":"hi"}]}'
 """
 
 from __future__ import annotations
 
-import json
-from collections.abc import AsyncIterator
-
-import httpx
-
-from backend.config import settings
-
-
-class OllamaProvider:
-    def __init__(self, base_url: str | None = None) -> None:
-        self.base_url = (base_url or settings.ollama_base_url).rstrip("/")
-
-    async def list_models(self) -> list[str]:
-        """Return the names of models the user has pulled (`ollama pull ...`)."""
-        async with httpx.AsyncClient(timeout=10) as client:
-            resp = await client.get(f"{self.base_url}/api/tags")
-            resp.raise_for_status()
-            data = resp.json()
-        return [m["name"] for m in data.get("models", [])]
-
-    async def stream_chat(
-        self,
-        messages: list[dict[str, str]],
-        model: str | None = None,
-    ) -> AsyncIterator[str]:
-        """Stream a chat completion from Ollama, one text chunk at a time."""
-        payload = {
-            "model": model or settings.ollama_default_model,
-            "messages": messages,
-            "stream": True,
-        }
-        async with httpx.AsyncClient(timeout=None) as client:
-            async with client.stream(
-                "POST", f"{self.base_url}/api/chat", json=payload
-            ) as resp:
-                resp.raise_for_status()
-                async for line in resp.aiter_lines():
-                    if not line.strip():
-                        continue
-                    data = json.loads(line)
-                    chunk = data.get("message", {}).get("content", "")
-                    if chunk:
-                        yield chunk
-                    if data.get("done"):
-                        break
+# TODO: implement the OllamaProvider class (list_models + stream_chat).

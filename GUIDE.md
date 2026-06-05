@@ -1,9 +1,11 @@
 # 🧭 The Atlas Build Guide
 
 A step-by-step path to build Atlas — your local AI Swiss-army knife — from the
-scaffold that's already here to the full vision. It's written for someone
-**learning as they build**, in the spirit of PewDiePie's Odysseus: own it, shape
-it, understand every piece.
+scaffold that's already here to the full vision. The repo ships the structure
+and a *guided stub* for each piece — a short note on what to build and why — but
+no feature code: **you write that.** It's written for someone **learning as they
+build**, in the spirit of PewDiePie's Odysseus: own it, shape it, understand
+every piece.
 
 ## How to use this guide
 
@@ -57,31 +59,45 @@ mastery — just enough to be dangerous. Spend a few days here.
 > learn the rest *inside* each phase, with real code in front of you.
 
 ✅ **Done when:** you can open PowerShell, activate the venv, run `python run.py`,
-open `http://127.0.0.1:8000`, and chat with a local model.
+see the app shell boot at `http://127.0.0.1:8000` (and the auto-generated API
+docs at `/docs`), and explain in your own words what each top-level folder is
+for. (Chatting with a model comes in Phase 1, once you build it.)
 
 ---
 
-## Phase 1 — Get the skeleton running
+## Phase 1 — Build the chat skeleton
 
-🎯 **Goal:** the existing chat skeleton works end-to-end on your machine.
+🎯 **Goal:** type a message in the browser and watch a local model stream its
+reply back. This is the backbone everything else hangs off — build it yourself.
 
-📚 **Learn:** installing Ollama; what a venv is; reading server logs.
+📚 **Learn:** installing Ollama; Ollama's `/api/chat` and `/api/tags` endpoints;
+async generators in Python (`async def` + `yield`); FastAPI `StreamingResponse`
+and Server-Sent Events; `fetch()` and reading a stream in JavaScript.
 
-🔨 **Steps:**
-1. Install **[Ollama](https://ollama.com/download)**. After install, open a new
-   terminal and confirm: `ollama --version`.
-2. Pull a small model: `ollama pull llama3.2` (or `llama3.2:1b` on a small PC).
-3. From the project root: `./scripts/setup.ps1` (creates venv, installs deps, `.env`).
-4. Start Atlas: `python run.py`.
-5. Open `http://127.0.0.1:8000` and send a message.
-6. **Read the code you just ran**, in this order — it's the whole request path:
-   - [frontend/js/app.js](frontend/js/app.js) — sends the message, streams the reply
-   - [backend/api/routes/chat.py](backend/api/routes/chat.py) — the `/api/chat` endpoint
-   - [backend/core/llm/ollama_provider.py](backend/core/llm/ollama_provider.py) — calls Ollama
-   - [backend/main.py](backend/main.py) — how it's all wired together
+🔨 **Steps — implement the stubs in this order (each file's docstring tells you
+what to build):**
+1. Install **[Ollama](https://ollama.com/download)**; confirm `ollama --version`.
+   Pull a small model: `ollama pull llama3.2` (or `llama3.2:1b` on a small PC).
+2. **Request schema** — [backend/schemas/chat.py](backend/schemas/chat.py):
+   a `Message` and a `ChatRequest`.
+3. **Provider interface** — [backend/core/llm/base.py](backend/core/llm/base.py):
+   decide what `stream_chat` takes and returns.
+4. **Ollama provider** — [backend/core/llm/ollama_provider.py](backend/core/llm/ollama_provider.py):
+   `list_models()` and a streaming `stream_chat()`.
+5. **Endpoints** — [backend/api/routes/chat.py](backend/api/routes/chat.py)
+   (`POST /api/chat`, streamed via SSE) and the `GET /api/models` half of
+   [backend/api/routes/models.py](backend/api/routes/models.py).
+6. **UI** — [frontend/index.html](frontend/index.html),
+   [frontend/css/styles.css](frontend/css/styles.css),
+   [frontend/js/app.js](frontend/js/app.js): a message area, an input, and a
+   model picker; fetch the models, post a message, render the streamed reply.
 
-✅ **Done when:** you get a streamed reply, *and* you can explain in one sentence
-what each of those four files does.
+💡 Test each layer before adding the next: try `/api/models` in `/docs`, then
+`/api/chat`, *then* wire the UI. Small steps make bugs easy to find.
+
+✅ **Done when:** you send a message in the browser and a local model streams its
+answer back, token by token — and you can explain how each layer passed the data
+to the next.
 
 ---
 
@@ -114,9 +130,10 @@ still there.
 streaming progress responses.
 
 🔨 **Steps:**
-1. Surface `GET /api/models/recommend` in the UI (it already exists — see
-   [backend/services/hardware/recommend.py](backend/services/hardware/recommend.py)).
-   Show each model with a "comfortable / tight / too large" badge.
+1. Implement the recommender in
+   [backend/services/hardware/recommend.py](backend/services/hardware/recommend.py)
+   and the `GET /api/models/recommend` route, then surface it in the UI. Show
+   each model with a "comfortable / tight / too large" badge.
 2. Add `POST /api/models/pull` that proxies Ollama's pull and streams progress.
 3. Add delete. Show installed size + a one-click "use this model".
 4. *(Stretch)* detect GPU VRAM and prefer it over system RAM in the recommender.

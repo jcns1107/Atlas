@@ -1,5 +1,5 @@
-"""Hardware detection + model recommendations."""
+"""Hardware detection + model recommendations (GUIDE.md, Phase 3).
 
-from backend.services.hardware.recommend import recommend_models, system_profile
-
-__all__ = ["recommend_models", "system_profile"]
+Detect what the machine can handle (RAM, CPU, and later GPU/VRAM) and recommend
+Ollama models that will actually run on it. Implement this in recommend.py.
+"""

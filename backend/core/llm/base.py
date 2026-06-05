@@ -1,24 +1,24 @@
-"""The provider interface every model backend implements.
+"""The provider interface — YOUR job to design (GUIDE.md, Phase 1).
 
-Why an interface? So 'chat with a local Ollama model' and 'chat with the
-Claude API' look identical to the rest of Atlas. When you add the Anthropic
-provider in a later phase, implement this same `stream_chat` method and
-nothing else has to change.
+Define the single shape every model backend implements. When you later add an
+API provider (Phase 12), it implements this same shape and nothing else in
+Atlas has to change. That's the whole point of having an interface.
+
+Questions to answer as you design it:
+  - What does "chat" need as INPUT? (probably a list of {role, content}
+    messages, a model name, maybe sampling settings like temperature.)
+  - What does it RETURN? For streaming, an async generator of text chunks
+    (`AsyncIterator[str]`).
+
+A Python `Protocol` (from `typing`) is a clean way to express an interface
+without forcing every provider to inherit from a base class. A suggested shape
+— design your own:
+
+    async def stream_chat(messages, model=None) -> AsyncIterator[str]: ...
+
+Write the interface below.
 """
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator
-from typing import Protocol
-
-
-class ChatProvider(Protocol):
-    """Anything that can turn a list of messages into streamed text."""
-
-    async def stream_chat(
-        self,
-        messages: list[dict[str, str]],
-        model: str | None = None,
-    ) -> AsyncIterator[str]:
-        """Yield response text chunks as they arrive."""
-        ...
+# TODO: define your ChatProvider interface (Protocol or ABC).
