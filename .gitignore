@@ -1,0 +1,52 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# ---- Node / frontend tooling (if you add a build step later) ----
+node_modules/
+npm-debug.log*
+yarn-error.log*
+dist-frontend/
+
+# ---- Secrets & local config ----
+.env
+.env.local
+*.local.json
+# `.claude/settings.local.json` is personal Claude Code config — kept local.
+# Shared editor/AI settings can go in `.claude/settings.json` (commit that).
+
+# ---- Atlas local data (agents, characters, memory, skills, db) ----
+# Keep the folder structure, ignore the contents.
+data/*
+!data/.gitkeep
+!data/**/.gitkeep
+*.sqlite
+*.sqlite3
+*.db
+
+# ---- Models / large downloads (never commit weights) ----
+models/
+*.gguf
+*.bin
+*.safetensors
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp

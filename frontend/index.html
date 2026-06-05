@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Atlas</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <h1 class="logo">🧭 Atlas</h1>
+        <nav>
+          <a class="nav-item active" href="#">Chat</a>
+          <a class="nav-item" href="#" title="Coming soon">Agents</a>
+          <a class="nav-item" href="#" title="Coming soon">Tools &amp; MCP</a>
+          <a class="nav-item" href="#" title="Coming soon">Email</a>
+          <a class="nav-item" href="#" title="Coming soon">Research</a>
+          <a class="nav-item" href="#" title="Coming soon">Characters</a>
+        </nav>
+        <div class="model-picker">
+          <label for="model">Model</label>
+          <select id="model"></select>
+        </div>
+      </aside>
+
+      <main class="chat">
+        <div id="messages" class="messages"></div>
+        <form id="composer" class="composer">
+          <textarea
+            id="input"
+            placeholder="Message your local model…  (Ollama must be running)"
+            rows="1"
+          ></textarea>
+          <button type="submit">Send</button>
+        </form>
+      </main>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+  </body>
+</html>

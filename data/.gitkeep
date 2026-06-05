@@ -1,0 +1,2 @@
+# Keeps the data/ folder in git. Actual contents (agents, characters, memory,
+# skills, *.db) are gitignored — they're local to each machine.
