@@ -192,24 +192,40 @@ different tools, and each behaves differently.
 
 ---
 
-## Phase 6 — Memory
+## Phase 6 — Memory & RAG (build it by hand)
 
-🎯 **Goal:** agents remember facts across sessions.
+🎯 **Goal:** agents remember facts across sessions *and* can answer over your own
+notes/documents by retrieving the relevant bits and putting them in the prompt.
+That retrieve-then-generate pattern is **RAG (Retrieval-Augmented Generation)** —
+and you'll build a minimal version yourself so you understand every step before a
+framework ever does it for you.
 
-📚 **Learn:** SQLite basics (and `sqlite3`/`sqlmodel` in Python); the difference
-between short-term (the message list) and long-term (durable) memory; later,
-embeddings & vector search for "recall by meaning".
+📚 **Learn:** short-term (the message list) vs long-term (durable) memory; what an
+**embedding** is (text → a vector of numbers capturing meaning); **cosine
+similarity** ("how related are these two texts?"); the RAG pipeline —
+*chunk → embed → store → retrieve top-k → augment the prompt*; SQLite for storage.
 
 🔨 **Steps:**
-1. SQLite table: `(id, agent_id, key, value, source, created_at)`.
-2. A `memory` tool the agent can call to **write** ("remember that…") and
-   **recall** ("what do I know about…").
-3. Inject a handful of relevant memories into the system prompt each turn.
-4. *(Stretch)* add embeddings (e.g. `nomic-embed-text` via Ollama) + a vector
-   index so recall is by meaning, not exact key.
+1. **Plain memory first.** SQLite table `(id, agent_id, key, value, source,
+   created_at)`; a `memory` tool to **write** ("remember that…") and **recall**.
+2. **Add embeddings.** Embed text with `nomic-embed-text` via Ollama
+   (`POST /api/embeddings`); store each memory's vector next to its text. Put the
+   reusable pieces in [backend/core/rag/](backend/core/rag/).
+3. **Retrieve by meaning.** Each turn, embed the user's message, compute cosine
+   similarity against stored vectors, and pull the top few. That's retrieval, by
+   hand — no vector DB yet (`numpy` is all you need).
+4. **Augment.** Inject those snippets into the system prompt before calling the
+   model. Congratulations — that's RAG.
+5. **Point it at documents.** Let the user drop a `.txt`/`.md` file; split it into
+   overlapping chunks, embed, store — now the agent can answer questions about it.
 
-✅ **Done when:** you tell an agent your name in one session and it remembers in
-the next.
+✅ **Done when:** you tell an agent your name in one session and it remembers next
+session, *and* it can answer a question about a document you fed it — pointing at
+the chunk it used.
+
+> 📌 You built RAG from scratch on purpose. In **Phase 13** you'll swap your
+> hand-rolled vector search for a real vector database + a framework, now that you
+> know exactly what they do under the hood.
 
 ---
 
@@ -263,7 +279,9 @@ like you.
 🎯 **Goal:** multi-step runs that gather, read, and synthesize sources into a
 written, cited report.
 
-📚 **Learn:** agentic loops (plan → act → observe → repeat); web search APIs
+📚 **Learn:** this is **RAG applied to the live web** — retrieve sources, then
+generate a grounded, cited answer (same pattern as Phase 6, different source).
+Plus: agentic loops (plan → act → observe → repeat); web search APIs
 (`duckduckgo-search` is a simple start); extracting readable text; prompting for
 synthesis with citations.
 
@@ -336,6 +354,61 @@ basics; (optional) prompt caching.
 
 ✅ **Done when:** you flip a dropdown from `llama3.2` to `claude` and the same
 chat keeps working.
+
+---
+
+## Phase 13 — RAG, for real (vector DB + a framework)
+
+🎯 **Goal:** replace your hand-rolled retrieval from Phase 6 with a proper vector
+database and, optionally, a RAG framework — now that you know what they do.
+
+📚 **Learn:** vector databases (**Chroma** is the easiest local start; FAISS and
+Qdrant are alternatives); chunking strategies (size, overlap) and why they
+matter; **LangChain** or **LlamaIndex** document loaders + retrievers; *(stretch)*
+re-ranking and hybrid keyword+vector search.
+
+🔨 **Steps:**
+1. Stand up a local vector DB (`pip install chromadb`). Move your memory
+   embeddings into it — but keep the *same* retrieve interface from
+   [backend/core/rag/](backend/core/rag/) so nothing upstream changes. (This is
+   exactly why you built the seam.)
+2. Use a framework's loaders + text splitters (LangChain or LlamaIndex) to ingest
+   PDFs, markdown, and web pages into the store.
+3. Swap your by-hand top-k search for the framework's retriever.
+4. Compare honestly: is it better than your scratch version? Where, and why?
+   Write down what the framework bought you — and what it hid.
+
+✅ **Done when:** Atlas answers questions over a folder of your own documents using
+a real vector store, and you can articulate the trade-off vs. your hand-built RAG.
+
+---
+
+## Phase 14 — Orchestrate with LangGraph
+
+🎯 **Goal:** rebuild your agent loop and deep-research run as an explicit **graph**
+of steps, so complex multi-step flows are easier to reason about, resume, and add
+a human-in-the-loop to.
+
+📚 **Learn:** **LangGraph** core ideas — nodes (steps), edges (transitions),
+shared state, conditional routing, checkpoints/persistence, and human-in-the-loop
+interrupts. How it compares to the loops you wrote by hand in Phases 5 & 9.
+
+🔨 **Steps:**
+1. Re-express the agent tool loop as a graph: a "call model" node, a "run tool"
+   node, and a conditional edge that loops until the model answers in words.
+2. Re-express Deep Research as a graph: plan → search → read → synthesize, with
+   state tracking the sources gathered so far.
+3. Add a checkpoint so a long run can pause and resume, and an interrupt so you
+   can approve a step before it proceeds.
+4. Keep both implementations side by side behind your existing interfaces; choose
+   whichever you prefer per feature.
+
+✅ **Done when:** an agent or a research run executes as a LangGraph graph, and you
+can explain when a framework like this earns its complexity — and when plain
+scratch code is simpler.
+
+> 💡 The lesson of Phases 13–14 isn't "frameworks win." It's that you can now make
+> that call *yourself*, because you built the thing they abstract away.
 
 ---
 

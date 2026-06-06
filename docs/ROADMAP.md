@@ -39,10 +39,12 @@ Everything below is **yours to implement**.
 - [ ] Create/edit/save agents from the UI
 - [ ] Agent run loop wired into chat
 
-## ⬜ Phase 6 — Memory
+## ⬜ Phase 6 — Memory & RAG (by hand)
 - [ ] SQLite store (key, value, source, time)
 - [ ] Write/recall during a conversation
-- [ ] (Stretch) semantic recall via embeddings
+- [ ] Embeddings (Ollama `nomic-embed-text`) + cosine-similarity retrieval
+- [ ] Augment the prompt with retrieved snippets (this is RAG)
+- [ ] Answer questions over a user-provided document
 
 ## ⬜ Phase 7 — MCP
 - [ ] Connect an MCP server (stdio/HTTP)
@@ -54,7 +56,7 @@ Everything below is **yours to implement**.
 - [ ] Summaries, style-matched drafts
 - [ ] Auto-tagging + spam/priority triage
 
-## ⬜ Phase 9 — Deep Research
+## ⬜ Phase 9 — Deep Research (RAG over the web)
 - [ ] Plan → search → read → synthesize loop
 - [ ] Cited report written to `data/`
 
@@ -70,3 +72,14 @@ Everything below is **yours to implement**.
 - [ ] Anthropic + OpenAI providers behind the same interface
 - [ ] Provider/model switcher; cost & token display
 - [ ] (Stretch) voice in/out for "talk with your agents"
+
+## ⬜ Phase 13 — RAG, for real (vector DB + framework)
+- [ ] Move embeddings into a vector DB (Chroma/FAISS/Qdrant)
+- [ ] Document loaders + chunking via LangChain or LlamaIndex
+- [ ] Swap hand-rolled retrieval for a framework retriever (same interface)
+- [ ] (Stretch) re-ranking / hybrid search
+
+## ⬜ Phase 14 — Orchestrate with LangGraph
+- [ ] Agent loop as a LangGraph graph (nodes / edges / state)
+- [ ] Deep Research as a graph with source-tracking state
+- [ ] Checkpoint + human-in-the-loop interrupt

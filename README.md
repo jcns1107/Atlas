@@ -30,6 +30,8 @@ own and shape yourself.
 | 📧 **Email assistant** | Summaries, style-matched drafts, auto-tagging & spam triage over IMAP/SMTP | 8 |
 | 🔎 **Deep Research** | Multi-step runs that gather, read & synthesize sources into a report | 9 |
 | 🧠 **Memory** | Durable facts recalled across sessions | 6 |
+| 📚 **RAG over your docs** | Ground answers in your own notes & files (retrieval) | 6, 13 |
+| ⚙️ **Frameworks (optional)** | Vector DB + LangChain/LlamaIndex/LangGraph, *after* you've built the basics by hand | 13, 14 |
 | 🌱 **Self-evolving Skills** | The assistant writes, refines & reuses its own skills | 10 |
 | 🎭 **Characters** | Personas with voice & backstory you can design | 11 |
 | 🔌 **API models too** | Use Claude/OpenAI alongside local models | 12 |
@@ -81,6 +83,7 @@ Atlas/
 │   │   ├── tools/        # built-in tools (bash, files, web, memory)
 │   │   ├── mcp/          # MCP client
 │   │   ├── memory/       # long-term memory
+│   │   ├── rag/          # retrieval: embeddings → search → augment (RAG)
 │   │   ├── skills/       # self-evolving skills
 │   │   └── characters/   # personas
 │   ├── services/         # email, research, hardware

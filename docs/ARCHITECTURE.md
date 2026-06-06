@@ -69,3 +69,17 @@ tool → feed the result back → repeat) but the transport stays identical.
 - **No frontend framework** — you wanted to design with HTML/CSS directly, and
   it removes a build step while learning. Swap in React/Svelte later if desired.
 - **Data-as-files** — agents/characters/skills are inspectable and shareable.
+
+## RAG and frameworks (scratch-then-framework)
+
+Memory and Deep Research both rely on **RAG** — retrieve the text most relevant to
+a question, then put it in the prompt so the answer is grounded in *your* data
+(notes, files, web sources) rather than the model's frozen training memory.
+
+You build RAG **by hand first** (embeddings + cosine similarity in `core/rag/`,
+Phase 6) to learn the mechanics. Only later (Phases 13–14) do you optionally swap
+in a **vector database** (Chroma/FAISS/Qdrant) and a **framework** — **LangChain**
+or **LlamaIndex** for retrieval, **LangGraph** for multi-step agent/research
+orchestration — *behind the same `core/rag/` and agent-loop interfaces*, so the
+rest of Atlas doesn't change. Frameworks are an informed later choice here, never
+a starting dependency.

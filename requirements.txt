@@ -15,3 +15,13 @@ psutil>=5.9            # hardware detection for model recommendations
 # sqlmodel>=0.0.21     # typed SQLite models for memory
 # pytest>=8.0          # tests
 # ruff>=0.6            # linter/formatter
+#
+# ---- Phase 6: RAG by hand (no heavy deps — Ollama does the embeddings) ----
+# numpy                # store vectors + compute cosine similarity yourself
+#
+# ---- Phases 13-14: vector DB + frameworks (adopt once you grok the basics) ----
+# chromadb             # local vector database
+# langchain            # RAG building blocks: loaders, splitters, retrievers
+# langchain-community  # integrations (Ollama, Chroma, ...)
+# langgraph            # stateful multi-step agent / research orchestration
+# llama-index          # RAG-focused alternative to LangChain

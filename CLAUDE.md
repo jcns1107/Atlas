@@ -32,6 +32,10 @@ for them. If a request is ambiguous, ask whether they want guidance or code.
 - **Frontend:** plain HTML/CSS/JS in `frontend/` (no build step, no framework).
 - **LLM:** Ollama REST API (`http://localhost:11434`) via a provider interface.
 - **Storage:** JSON files + SQLite under `data/` (gitignored).
+- **RAG / frameworks:** built by hand first (embeddings + cosine similarity in
+  `core/rag/`, Phase 6). A vector DB (Chroma) + LangChain/LlamaIndex/LangGraph are
+  an *optional later* swap (Phases 13–14) behind the same interfaces — **not** a
+  starting dependency. Don't introduce them earlier unless the owner asks.
 - **Tests:** pytest. **Lint/format:** ruff.
 
 ## Commands
