@@ -25,14 +25,15 @@ own and shape yourself.
 | --- | --- | --- |
 | 💬 **Chat with your agents** | Talk (and eventually speak) with any agent you create | 1 |
 | 🤖 **Custom agents** | Model + persona + tools + memory, defined as data | 5 |
-| 🧰 **Tools & MCP** | Built-in bash/files/web/memory + any MCP server, toggleable per tool | 4, 7 |
+| 🧰 **Tools & MCP** | Built-in bash/files/docs/web/memory + any MCP server, with per-tool permissions | 4, 7 |
 | 🖥️ **Hardware-aware models** | Recommends models that fit your RAM/VRAM | 3 |
 | 📧 **Email assistant** | Summaries, style-matched drafts, auto-tagging & spam triage over IMAP/SMTP | 8 |
 | 🔎 **Deep Research** | Multi-step runs that gather, read & synthesize sources into a report | 9 |
 | 🧠 **Memory** | Durable facts recalled across sessions | 6 |
-| 📚 **RAG over your docs** | Ground answers in your own notes & files (retrieval) | 6, 13 |
+| 📚 **Answers over your docs** | Picks the cheapest way in: stuff into the prompt, agentic search, or RAG | 6, 13 |
+| 🪢 **A real harness** | Tool loop, approvals, context budget & compaction, sub-agents | 4, 5, 9 |
 | ⚙️ **Frameworks (optional)** | Vector DB + LangChain/LlamaIndex/LangGraph, *after* you've built the basics by hand | 13, 14 |
-| 🌱 **Self-evolving Skills** | The assistant writes, refines & reuses its own skills | 10 |
+| 🌱 **Self-evolving Skills** | The assistant writes, refines & reuses its own skills (Agent Skills `SKILL.md` format) | 10 |
 | 🎭 **Characters** | Personas with voice & backstory you can design | 11 |
 | 🔌 **API models too** | Use Claude/OpenAI alongside local models | 12 |
 | 🎨 **Local web UI** | Plain HTML/CSS/JS you fully control | 1 |
@@ -41,30 +42,31 @@ own and shape yourself.
 
 ## 🚀 Get started
 
-**Prerequisites:** Python 3.11+, and [Ollama](https://ollama.com/download).
+**Prerequisites:** [uv](https://docs.astral.sh/uv/) (it installs Python for you) and [Ollama](https://ollama.com/download).
 
 ```powershell
-# 1. One-time setup (creates venv, installs deps, makes .env)
+# 1. One-time setup (uv sync: creates .venv, installs deps, makes .env)
 ./scripts/setup.ps1
 
 # 2. Boot the app shell — a health check + an empty UI you'll build out
-python run.py
+uv run python run.py
 #    -> http://127.0.0.1:8000   (interactive API docs at /docs)
 ```
 
 That boots today, but the features aren't built yet — **that's the point.** Open
 **[GUIDE.md](GUIDE.md)**, start at **Phase 0**, then implement **Phase 1** (your
-first real chat) into the guided stubs. You'll `ollama pull llama3.2` when Phase 1
+first real chat) into the guided stubs. You'll `ollama pull qwen3:4b` when Phase 1
 tells you to.
 
 Prefer manual setup over the script?
 
 ```powershell
-python -m venv .venv
-. .\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+uv sync                      # .venv + core deps + dev tools (pytest, ruff)
 Copy-Item .env.example .env
-python run.py
+uv run python run.py
+
+# Later phases add optional bundles, e.g.:
+uv sync --extra tools --extra rag
 ```
 
 ---
@@ -83,6 +85,7 @@ Atlas/
 │   │   ├── tools/        # built-in tools (bash, files, web, memory)
 │   │   ├── mcp/          # MCP client
 │   │   ├── memory/       # long-term memory
+│   │   ├── context/      # token budget, prompt assembly, compaction
 │   │   ├── rag/          # retrieval: embeddings → search → augment (RAG)
 │   │   ├── skills/       # self-evolving skills
 │   │   └── characters/   # personas
@@ -93,6 +96,7 @@ Atlas/
 ├── docs/                 # architecture + roadmap
 ├── tests/                # pytest
 ├── scripts/              # setup helpers
+├── pyproject.toml        # dependencies (+ optional extras per phase), managed by uv
 ├── GUIDE.md              # 👈 the step-by-step build guide
 └── CLAUDE.md             # guidance for AI coding assistants
 ```

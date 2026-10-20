@@ -15,6 +15,11 @@
 // 3. Keep a `history` array of { role, content } so the model has context on
 //    each turn (push the user message, then the assistant's full reply).
 //
+// Later (Phase 4) the stream carries more than answer text — "thinking",
+// tool calls, and tool results. Plan for each SSE frame to say what kind of
+// event it is (e.g. data: {"kind": "text", "text": "..."}) so the UI can show
+// each kind differently.
+//
 // Hints:
 //   - fetch(url, { method, headers: { "Content-Type": "application/json" }, body })
 //   - new TextDecoder() turns streamed bytes into text.

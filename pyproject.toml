@@ -5,6 +5,42 @@ description = "A Swiss-army knife of local AI — chat with your own agents, pow
 readme = "README.md"
 requires-python = ">=3.11"
 
+# ---- Core (needed for the starter skeleton to run) ----
+# Installed by a plain `uv sync`.
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "httpx2>=2.0",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "psutil>=5.9",  # hardware detection for model recommendations
+    "ollama>=0.6.3",
+]
+
+# ---- Add these as you reach the matching guide phase ----
+# Each "extra" is an optional bundle. Install one with e.g. `uv sync --extra rag`,
+# or several at once: `uv sync --extra tools --extra research`.
+# (Memory in Phase 6 uses Python's built-in `sqlite3` — no extra needed.)
+[project.optional-dependencies]
+# Phase 4: the `web` tool — fetch a page and pull out the readable text.
+tools = ["beautifulsoup4>=4.12", "trafilatura>=2.0"]
+# Phase 7: Model Context Protocol client (and, as a stretch, server).
+# SDK v2 targets the 2026-07-28 MCP spec (`from mcp import Client`).
+mcp = ["mcp>=2.0"]
+# Phase 9: web search for Deep Research (the package formerly called duckduckgo-search).
+research = ["ddgs>=9.0"]
+# Phases 6 & 13: RAG by hand. numpy for the vector math; sqlite-vec adds
+# vector search inside the SQLite file you already use (Phase 13).
+rag = ["numpy>=2.0", "sqlite-vec>=0.1.6"]
+# Phase 12: API model providers (Claude, OpenAI-compatible).
+api = ["anthropic>=1.0", "openai>=2.0"]
+# Phases 13-14: vector DB + frameworks — adopt once you grok the basics.
+frameworks = ["chromadb>=1.0", "llama-index>=0.14", "langgraph>=1.0"]
+
+# Developer tools — installed by default with `uv sync` (uv's "dev" group).
+[dependency-groups]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"

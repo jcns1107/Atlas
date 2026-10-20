@@ -16,6 +16,13 @@ without forcing every provider to inherit from a base class. A suggested shape
 
     async def stream_chat(messages, model=None) -> AsyncIterator[str]: ...
 
+Start with plain text chunks — it's all Phase 1 needs. Expect to CHANGE this
+interface in Phase 4: once models think and call tools, one stream carries
+several kinds of things (a piece of answer text, a piece of "thinking", a tool
+call, a final "done" with token counts). You'll upgrade the yield type to small
+typed events (e.g. a dataclass with a `kind` field). Evolving your own interface
+when the requirements grow is part of the lesson — not a mistake.
+
 Write the interface below.
 """
 

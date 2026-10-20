@@ -26,11 +26,18 @@ class Settings(BaseSettings):
 
     # Ollama
     ollama_base_url: str = "http://localhost:11434"
-    ollama_default_model: str = "llama3.2"
+    ollama_default_model: str = "qwen3:4b"
+    ollama_embed_model: str = "embeddinggemma"
+    # Ollama's default window is small and overflow is cut silently, so we
+    # always send num_ctx explicitly (see core/context/ for the budget logic).
+    ollama_num_ctx: int = 8192
+    # A Jev-style decision model for yes/no, pick-one and score questions (Phase 8).
+    ollama_decision_model: str = "nimble"
 
     # Optional API providers
     anthropic_api_key: str = ""
     openai_api_key: str = ""
+    jev_api_key: str = ""  # hosted Jev decision model (TypeSafe)
 
 
 settings = Settings()
