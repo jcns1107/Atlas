@@ -44,7 +44,9 @@ Everything below is **yours to implement**.
 - [ ] Define the provider interface (`backend/core/llm/base.py`)
 - [ ] Implement the Ollama provider (`backend/core/llm/ollama_provider.py`), sending `num_ctx`
 - [ ] Implement `POST /api/chat` (stream the reply) + `GET /api/models`
-- [ ] Build the minimal chat UI and wire it up
+- [x] Build the minimal chat UI and wire it up — done by Claude: the JARVIS-style HUD in
+      `frontend/` (chat with streaming, module ring that lights up per route, real
+      telemetry, boot sequence). Reads SSE frames as `{"kind": ...}` JSON.
 
 ## ⬜ Phase 2 — Better chat
 - [ ] Multiple conversations, saved to `data/`

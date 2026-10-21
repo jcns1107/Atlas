@@ -43,4 +43,72 @@ Fields you'll meet in later phases (same endpoint, more of the chunk):
 
 from __future__ import annotations
 
-# TODO: implement the OllamaProvider class (list_models + stream_chat).
+import json
+from collections.abc import AsyncIterator
+
+# The package is "httpx2" and so is the module name. `import httpx` only worked
+# by accident, because the unused `ollama` package pulls the old httpx in.
+import httpx2
+
+from backend.config import settings
+from backend.core.llm.base import Message
+
+
+class OllamaProvider:
+    """Talk to a local Ollama server (default http://localhost:11434).
+
+    Implements the ChatProvider interface from base.py.
+    """
+
+    def __init__(self) -> None:
+        """Initialize the OllamaProvider."""
+        self.base_url = settings.ollama_base_url
+        self.default_model = settings.ollama_default_model
+        self.num_ctx = settings.ollama_num_ctx
+
+    async def list_models(self) -> list[str]:
+        """Return list of models of the provider"""
+        url = f"{self.base_url}/api/tags"
+        async with httpx2.AsyncClient() as client:
+            response = await client.get(url)
+            response.raise_for_status()
+            data = response.json()
+            return [m["name"] for m in data["models"]]
+
+    async def stream_chat(
+        self, messages: list[Message], model: str | None = None
+    ) -> AsyncIterator[str]:
+        """Send the conversation to the model and yields the text as it arrives"""
+        model = model or self.default_model
+        url = f"{self.base_url}/api/chat"
+        payload = {
+            "model": model,
+            "messages": [message.model_dump() for message in messages],
+            "stream": True,
+            "options": {"num_ctx": self.num_ctx},
+        }
+
+        async with httpx2.AsyncClient(timeout=httpx2.Timeout(10.0, read=300.0)) as client:
+            async with client.stream("POST", url, json=payload) as response:
+                # Errors like "model not found" come back as an HTTP error *before*
+                # streaming starts. A streamed response doesn't load its body
+                # automatically, so read it to get the reason.
+                if response.is_error:
+                    await response.aread()
+                    raise RuntimeError(f"Ollama error {response.status_code}: {response.text}")
+
+                async for line in response.aiter_lines():
+                    if not line:
+                        continue
+
+                    data = json.loads(line)
+                    if "error" in data:
+                        raise RuntimeError(f"Ollama error: {data['error']}")
+
+                    if data.get("done"):
+                        break
+
+                    message = data.get("message", {})
+                    content = message.get("content", "")
+                    if content:
+                        yield content

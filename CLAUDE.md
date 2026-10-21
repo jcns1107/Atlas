@@ -26,6 +26,12 @@ ask for help, default to *explaining* concepts, *reviewing* their code, pointing
 at the right docs/APIs, and unblocking specific bugs — not writing the feature
 for them. If a request is ambiguous, ask whether they want guidance or code.
 
+**Exception — the frontend is Claude's job.** The owner is learning the backend /
+AI side, not frontend development. Build and maintain `frontend/` yourself
+(design, HTML/CSS/JS, animations) using the design skills in `.claude/skills/`;
+the owner only reviews it. The "explain, don't implement" rule above still
+applies to everything under `backend/`.
+
 ## Tech stack
 
 - **Backend:** Python 3.11+, FastAPI, httpx2 (maintained httpx fork, same API),

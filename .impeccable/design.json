@@ -1,0 +1,639 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-21T16:14:16Z",
+  "title": "Design System: Atlas",
+  "extensions": {
+    "colorMeta": {
+      "signal": {
+        "role": "primary",
+        "displayName": "Signal Cyan",
+        "canonical": "#3ad8ff",
+        "cssVar": "--signal",
+        "tonalRamp": [
+          "oklch(15.0% 0.136 218.9)",
+          "oklch(26.4% 0.136 218.9)",
+          "oklch(37.9% 0.136 218.9)",
+          "oklch(49.3% 0.136 218.9)",
+          "oklch(60.7% 0.136 218.9)",
+          "oklch(72.1% 0.136 218.9)",
+          "oklch(83.6% 0.136 218.9)",
+          "oklch(95.0% 0.136 218.9)"
+        ]
+      },
+      "signal-soft": {
+        "role": "primary",
+        "displayName": "Signal Soft",
+        "canonical": "rgba(58, 216, 255, 0.55)",
+        "cssVar": "--signal-soft",
+        "tonalRamp": [
+          "oklch(15.0% 0.136 218.9)",
+          "oklch(26.4% 0.136 218.9)",
+          "oklch(37.9% 0.136 218.9)",
+          "oklch(49.3% 0.136 218.9)",
+          "oklch(60.7% 0.136 218.9)",
+          "oklch(72.1% 0.136 218.9)",
+          "oklch(83.6% 0.136 218.9)",
+          "oklch(95.0% 0.136 218.9)"
+        ]
+      },
+      "core": {
+        "role": "primary",
+        "displayName": "Core White",
+        "canonical": "#eafcff",
+        "cssVar": "--core",
+        "tonalRamp": [
+          "oklch(15.0% 0.019 208.8)",
+          "oklch(26.4% 0.019 208.8)",
+          "oklch(37.9% 0.019 208.8)",
+          "oklch(49.3% 0.019 208.8)",
+          "oklch(60.7% 0.019 208.8)",
+          "oklch(72.1% 0.019 208.8)",
+          "oklch(83.6% 0.019 208.8)",
+          "oklch(95.0% 0.019 208.8)"
+        ]
+      },
+      "amber": {
+        "role": "secondary",
+        "displayName": "Stub Amber",
+        "canonical": "#ffb84d",
+        "cssVar": "--amber",
+        "tonalRamp": [
+          "oklch(15.0% 0.145 74.2)",
+          "oklch(26.4% 0.145 74.2)",
+          "oklch(37.9% 0.145 74.2)",
+          "oklch(49.3% 0.145 74.2)",
+          "oklch(60.7% 0.145 74.2)",
+          "oklch(72.1% 0.145 74.2)",
+          "oklch(83.6% 0.145 74.2)",
+          "oklch(95.0% 0.145 74.2)"
+        ]
+      },
+      "amber-soft": {
+        "role": "secondary",
+        "displayName": "Amber Soft",
+        "canonical": "rgba(255, 184, 77, 0.14)",
+        "cssVar": "--amber-soft",
+        "tonalRamp": [
+          "oklch(15.0% 0.145 74.2)",
+          "oklch(26.4% 0.145 74.2)",
+          "oklch(37.9% 0.145 74.2)",
+          "oklch(49.3% 0.145 74.2)",
+          "oklch(60.7% 0.145 74.2)",
+          "oklch(72.1% 0.145 74.2)",
+          "oklch(83.6% 0.145 74.2)",
+          "oklch(95.0% 0.145 74.2)"
+        ]
+      },
+      "red": {
+        "role": "tertiary",
+        "displayName": "Fault Red",
+        "canonical": "#ff6b76",
+        "cssVar": "--red",
+        "tonalRamp": [
+          "oklch(15.0% 0.180 18.4)",
+          "oklch(26.4% 0.180 18.4)",
+          "oklch(37.9% 0.180 18.4)",
+          "oklch(49.3% 0.180 18.4)",
+          "oklch(60.7% 0.180 18.4)",
+          "oklch(72.1% 0.180 18.4)",
+          "oklch(83.6% 0.180 18.4)",
+          "oklch(95.0% 0.180 18.4)"
+        ]
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Projection Ground",
+        "canonical": "#02060a",
+        "cssVar": "--ground",
+        "tonalRamp": [
+          "oklch(15.0% 0.016 238.4)",
+          "oklch(26.4% 0.016 238.4)",
+          "oklch(37.9% 0.016 238.4)",
+          "oklch(49.3% 0.016 238.4)",
+          "oklch(60.7% 0.016 238.4)",
+          "oklch(72.1% 0.016 238.4)",
+          "oklch(83.6% 0.016 238.4)",
+          "oklch(95.0% 0.016 238.4)"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Panel Glass",
+        "canonical": "rgba(8, 28, 40, 0.42)",
+        "cssVar": "--panel",
+        "tonalRamp": [
+          "oklch(15.0% 0.035 237.6)",
+          "oklch(26.4% 0.035 237.6)",
+          "oklch(37.9% 0.035 237.6)",
+          "oklch(49.3% 0.035 237.6)",
+          "oklch(60.7% 0.035 237.6)",
+          "oklch(72.1% 0.035 237.6)",
+          "oklch(83.6% 0.035 237.6)",
+          "oklch(95.0% 0.035 237.6)"
+        ]
+      },
+      "panel-solid": {
+        "role": "neutral",
+        "displayName": "Panel Solid",
+        "canonical": "#06131c",
+        "cssVar": "--panel-solid",
+        "tonalRamp": [
+          "oklch(15.0% 0.027 239.5)",
+          "oklch(26.4% 0.027 239.5)",
+          "oklch(37.9% 0.027 239.5)",
+          "oklch(49.3% 0.027 239.5)",
+          "oklch(60.7% 0.027 239.5)",
+          "oklch(72.1% 0.027 239.5)",
+          "oklch(83.6% 0.027 239.5)",
+          "oklch(95.0% 0.027 239.5)"
+        ]
+      },
+      "raised": {
+        "role": "neutral",
+        "displayName": "Raised Tint",
+        "canonical": "rgba(57, 213, 255, 0.07)",
+        "cssVar": "--raised",
+        "tonalRamp": [
+          "oklch(15.0% 0.136 220.8)",
+          "oklch(26.4% 0.136 220.8)",
+          "oklch(37.9% 0.136 220.8)",
+          "oklch(49.3% 0.136 220.8)",
+          "oklch(60.7% 0.136 220.8)",
+          "oklch(72.1% 0.136 220.8)",
+          "oklch(83.6% 0.136 220.8)",
+          "oklch(95.0% 0.136 220.8)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Line",
+        "canonical": "rgba(90, 205, 255, 0.2)",
+        "cssVar": "--line",
+        "tonalRamp": [
+          "oklch(15.0% 0.125 229.8)",
+          "oklch(26.4% 0.125 229.8)",
+          "oklch(37.9% 0.125 229.8)",
+          "oklch(49.3% 0.125 229.8)",
+          "oklch(60.7% 0.125 229.8)",
+          "oklch(72.1% 0.125 229.8)",
+          "oklch(83.6% 0.125 229.8)",
+          "oklch(95.0% 0.125 229.8)"
+        ]
+      },
+      "line-strong": {
+        "role": "neutral",
+        "displayName": "Line Strong",
+        "canonical": "rgba(110, 220, 255, 0.42)",
+        "cssVar": "--line-strong",
+        "tonalRamp": [
+          "oklch(15.0% 0.112 221.4)",
+          "oklch(26.4% 0.112 221.4)",
+          "oklch(37.9% 0.112 221.4)",
+          "oklch(49.3% 0.112 221.4)",
+          "oklch(60.7% 0.112 221.4)",
+          "oklch(72.1% 0.112 221.4)",
+          "oklch(83.6% 0.112 221.4)",
+          "oklch(95.0% 0.112 221.4)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#d8f6ff",
+        "cssVar": "--ink",
+        "tonalRamp": [
+          "oklch(15.0% 0.034 217.7)",
+          "oklch(26.4% 0.034 217.7)",
+          "oklch(37.9% 0.034 217.7)",
+          "oklch(49.3% 0.034 217.7)",
+          "oklch(60.7% 0.034 217.7)",
+          "oklch(72.1% 0.034 217.7)",
+          "oklch(83.6% 0.034 217.7)",
+          "oklch(95.0% 0.034 217.7)"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Ink 2",
+        "canonical": "#8fc7da",
+        "cssVar": "--ink-2",
+        "tonalRamp": [
+          "oklch(15.0% 0.064 221.0)",
+          "oklch(26.4% 0.064 221.0)",
+          "oklch(37.9% 0.064 221.0)",
+          "oklch(49.3% 0.064 221.0)",
+          "oklch(60.7% 0.064 221.0)",
+          "oklch(72.1% 0.064 221.0)",
+          "oklch(83.6% 0.064 221.0)",
+          "oklch(95.0% 0.064 221.0)"
+        ]
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Ink 3",
+        "canonical": "#6fa3b6",
+        "cssVar": "--ink-3",
+        "tonalRamp": [
+          "oklch(15.0% 0.062 222.9)",
+          "oklch(26.4% 0.062 222.9)",
+          "oklch(37.9% 0.062 222.9)",
+          "oklch(49.3% 0.062 222.9)",
+          "oklch(60.7% 0.062 222.9)",
+          "oklch(72.1% 0.062 222.9)",
+          "oklch(83.6% 0.062 222.9)",
+          "oklch(95.0% 0.062 222.9)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "readout": {
+        "displayName": "Readout",
+        "purpose": "Live measured values in the telemetry rail (Link latency); 28px on desktop screens under 840px tall. Always core white with glow."
+      },
+      "clock": {
+        "displayName": "Clock",
+        "purpose": "Top-bar clock only; 20px on phones."
+      },
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "The ATLAS wordmark in the top bar only, uppercase, core white with glow."
+      },
+      "core-state": {
+        "displayName": "Core State",
+        "purpose": "The state word on the core's disc, uppercase, scaled to the core's own width; 14px beside the phone instrument."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Session log title and popover title, HUD voice (uppercase)."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Panel heads and buttons, HUD voice (uppercase). Set width with font-stretch: 125%."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Message bodies and the composer input, normal width, sentence case."
+      },
+      "meta": {
+        "displayName": "Meta",
+        "purpose": "Key-value labels, chip values, notes, counts and the bottom strip."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Code blocks (13px) and API routes / file paths (11-12px), always with real casing."
+      }
+    },
+    "shadows": [
+      {
+        "name": "glow",
+        "value": "0 0 14px rgba(58, 216, 255, 0.55)",
+        "purpose": "The --glow text-shadow: wordmark, clock, readout values, online node names, Atlas speaker label, plate, phone core state."
+      },
+      {
+        "name": "lit-dot",
+        "value": "0 0 8px #3ad8ff",
+        "purpose": "Status dots, meter fill, streaming caret, newest latency bar; amber and red versions on warn and bad chips."
+      },
+      {
+        "name": "warn-readout",
+        "value": "0 0 12px rgba(255, 184, 77, 0.45)",
+        "purpose": "Text-shadow on the Link readout when a health check fails."
+      },
+      {
+        "name": "composer-focus",
+        "value": "0 0 0 1px rgba(58, 216, 255, 0.4), 0 0 26px rgba(58, 216, 255, 0.14)",
+        "purpose": "Composer while focused, with a signal border."
+      },
+      {
+        "name": "log-receiving",
+        "value": "0 0 18px rgba(58, 216, 255, 0.25)",
+        "purpose": "On a 1px signal frame at 55% opacity, flashed on the session log when a reply pulse lands."
+      },
+      {
+        "name": "popover",
+        "value": "0 16px 40px rgba(0, 0, 0, 0.55)",
+        "purpose": "Module popover only (opaque panel-solid fill)."
+      },
+      {
+        "name": "sheet",
+        "value": "0 20px 50px rgba(0, 0, 0, 0.6)",
+        "purpose": "Systems sheet at 1180px and narrower (opaque ground fill)."
+      },
+      {
+        "name": "core-disc",
+        "value": "drop-shadow(0 0 30px rgba(58, 216, 255, 0.45))",
+        "purpose": "SVG filter on the core's disc layer; scan arc 8px, context arc 6px, data arc 5px, brand mark 6px."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.23, 1, 0.32, 1)",
+        "purpose": "Responses: press, hover, popover, sheet, message entrance, meters, context arc, value flash, boot overlay fade."
+      },
+      {
+        "name": "ease-in-out",
+        "value": "cubic-bezier(0.77, 0, 0.175, 1)",
+        "purpose": "Travel: beam pulses and the core's glide home after boot."
+      },
+      {
+        "name": "ease-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Reveals: panel draw-in after boot and the core's rings opening."
+      },
+      {
+        "name": "press",
+        "value": "160ms ease-out, scale(0.97)",
+        "purpose": "Every button and module node on :active; suggested prompts use 0.985."
+      },
+      {
+        "name": "popover-enter",
+        "value": "160ms ease-out, opacity 0 + scale(0.96) to 1, origin at the node",
+        "purpose": "Module popover grows from its node."
+      },
+      {
+        "name": "sheet",
+        "value": "220ms ease-out, translateY(8px) + opacity",
+        "purpose": "Systems sheet open/close at 1180px and narrower."
+      },
+      {
+        "name": "message-enter",
+        "value": "260ms ease-out, translateY(8px) + opacity",
+        "purpose": "Each new message and boot log line."
+      },
+      {
+        "name": "value-flash",
+        "value": "700ms ease-out, from #fff with 12px signal glow",
+        "purpose": "A telemetry value that just changed."
+      },
+      {
+        "name": "meter-fill",
+        "value": "600ms ease-out, scaleX",
+        "purpose": "Context meter in the Session panel; the core's context arc uses 700ms on stroke-dasharray."
+      },
+      {
+        "name": "beam-pulse",
+        "value": "620ms ease-in-out, 70ms between beams; inbound pulses at most every 700ms",
+        "purpose": "Light travelling between the core and the session log; the log frame flashes 120ms on, 600ms off when it lands."
+      },
+      {
+        "name": "panel-reveal",
+        "value": "620ms ease-expo, clip-path inset from the right, 70ms stagger",
+        "purpose": "Panels draw in left to right after boot; 300ms fade under reduced motion."
+      },
+      {
+        "name": "boot-ring-open",
+        "value": "1000ms ease-expo, clip-path circle(0%) to circle(75%), 90ms stagger per layer",
+        "purpose": "Core layers open from the centre during boot."
+      },
+      {
+        "name": "boot-glide",
+        "value": "850ms ease-in-out FLIP transform",
+        "purpose": "Core returns from screen centre to its place; overlay fades 700ms."
+      },
+      {
+        "name": "boot-pacing",
+        "value": "900ms lead, >=280ms per line, 600ms tail",
+        "purpose": "Boot log readable pacing; skipped by click, key or reduced motion."
+      },
+      {
+        "name": "ring-periods",
+        "value": "ticks 140s cw, segments 90s ccw, data 46s cw (coupled); scan 1.1s cw (fixed)",
+        "purpose": "Base rotation per ring at speed 1."
+      },
+      {
+        "name": "ring-speeds",
+        "value": "booting 2.5, standby 1, listening 1.6, thinking 3, streaming 2 + min(chunks/s / 8, 6), error 0.4, offline 0 (instant)",
+        "purpose": "Playback-rate multiplier per core state; eased 6% per frame toward target."
+      },
+      {
+        "name": "chunk-energy",
+        "value": "+0.14 per chunk (cap 1), decay x0.9 per frame",
+        "purpose": "Disc scale 1 + 0.05*energy, opacity 0.82 + 0.18*energy; bloom scale 0.92 + 0.3*energy, opacity 0.18 + 0.7*energy."
+      },
+      {
+        "name": "caret-blink",
+        "value": "1s steps(1) infinite",
+        "purpose": "Streaming caret; steady under reduced motion."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "prefers-reduced-motion: reduce",
+        "purpose": "Rings paused, no beam pulses, no boot ring-open/glide/pacing, reveal becomes a 300ms fade, message entrances and caret blink off, instant log scroll; colour, opacity and brightness pulses remain."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "systems-drawer",
+        "value": "max-width: 1180px",
+        "purpose": "Two columns; telemetry rail becomes the Systems sheet; operator, version and Modules chip hide."
+      },
+      {
+        "name": "phone",
+        "value": "max-width: 760px",
+        "purpose": "One column; core becomes a 96px status instrument; chips, strip, beams and nodes hide; log runs edge to edge."
+      },
+      {
+        "name": "short-desktop",
+        "value": "max-height: 940px and min-width: 1181px",
+        "purpose": "Tighter panel padding; two notes hide."
+      },
+      {
+        "name": "short-desktop-tight",
+        "value": "max-height: 840px and min-width: 1181px",
+        "purpose": "Chunk caption hides; readouts drop to 28px."
+      },
+      {
+        "name": "core-container",
+        "value": "@container (max-width: 440px) on .core",
+        "purpose": "Node labels drop their phase line."
+      },
+      {
+        "name": "composer-container",
+        "value": "@container (max-width: 560px) on .composer",
+        "purpose": "Keyboard hint hides."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Transmit: the one filled control, signal cyan on near-black ink; transparent and dim while the composer is empty.",
+      "html": "<div class=\"ds-ground\"><button class=\"ds-btn ds-btn-primary\" type=\"button\">Transmit</button> <button class=\"ds-btn ds-btn-primary\" type=\"button\" disabled>Transmit</button></div>",
+      "css": ".ds-ground { background: var(--ground, #02060a); padding: 20px; color: var(--ink, #d8f6ff); font-family: var(--font, \"Saira\", system-ui, \"Segoe UI\", sans-serif); font-variant-numeric: tabular-nums; } .ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 34px; padding: 0 14px; border: 1px solid var(--line-strong, rgba(110, 220, 255, 0.42)); border-radius: var(--radius, 2px); background: transparent; font-family: inherit; font-size: var(--fs-label, 11px); font-weight: 600; font-stretch: 125%; text-transform: uppercase; letter-spacing: 0.14em; cursor: pointer; transition: transform 160ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)), background-color 160ms ease, border-color 160ms ease, color 160ms ease; } .ds-btn:active { transform: scale(0.97); } .ds-btn:focus-visible { outline: 2px solid var(--signal, #3ad8ff); outline-offset: 2px; } .ds-btn-primary { background: var(--signal, #3ad8ff); border-color: var(--signal, #3ad8ff); color: #01131c; } .ds-btn-primary:not(:disabled):hover { background: #7be6ff; } .ds-btn-primary:disabled { background: transparent; color: var(--ink-3, #6fa3b6); border-color: var(--line, rgba(90, 205, 255, 0.2)); cursor: not-allowed; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "New session and the Systems toggle: a line-strong frame with ink 2 text that brightens on hover.",
+      "html": "<div class=\"ds-ground\"><button class=\"ds-btn ds-btn-ghost\" type=\"button\">New session</button></div>",
+      "css": ".ds-ground { background: var(--ground, #02060a); padding: 20px; color: var(--ink, #d8f6ff); font-family: var(--font, \"Saira\", system-ui, \"Segoe UI\", sans-serif); font-variant-numeric: tabular-nums; } .ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 34px; padding: 0 14px; border: 1px solid var(--line-strong, rgba(110, 220, 255, 0.42)); border-radius: var(--radius, 2px); background: transparent; font-family: inherit; font-size: var(--fs-label, 11px); font-weight: 600; font-stretch: 125%; text-transform: uppercase; letter-spacing: 0.14em; cursor: pointer; transition: transform 160ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)), background-color 160ms ease, border-color 160ms ease, color 160ms ease; } .ds-btn:active { transform: scale(0.97); } .ds-btn:focus-visible { outline: 2px solid var(--signal, #3ad8ff); outline-offset: 2px; } .ds-btn-ghost { color: var(--ink-2, #8fc7da); } .ds-btn-ghost:hover { color: var(--ink, #d8f6ff); border-color: var(--signal-soft, rgba(58, 216, 255, 0.55)); }"
+    },
+    {
+      "name": "Stop Button",
+      "kind": "button",
+      "refersTo": "button-stop",
+      "description": "Replaces Transmit while a reply streams; amber because it interrupts.",
+      "html": "<div class=\"ds-ground\"><button class=\"ds-btn ds-btn-stop\" type=\"button\">Stop</button></div>",
+      "css": ".ds-ground { background: var(--ground, #02060a); padding: 20px; color: var(--ink, #d8f6ff); font-family: var(--font, \"Saira\", system-ui, \"Segoe UI\", sans-serif); font-variant-numeric: tabular-nums; } .ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 34px; padding: 0 14px; border: 1px solid var(--line-strong, rgba(110, 220, 255, 0.42)); border-radius: var(--radius, 2px); background: transparent; font-family: inherit; font-size: var(--fs-label, 11px); font-weight: 600; font-stretch: 125%; text-transform: uppercase; letter-spacing: 0.14em; cursor: pointer; transition: transform 160ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)), background-color 160ms ease, border-color 160ms ease, color 160ms ease; } .ds-btn:active { transform: scale(0.97); } .ds-btn:focus-visible { outline: 2px solid var(--signal, #3ad8ff); outline-offset: 2px; } .ds-btn-stop { border-color: var(--amber, #ffb84d); color: var(--amber, #ffb84d); } .ds-btn-stop:hover { background: var(--amber-soft, rgba(255, 184, 77, 0.14)); }"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Top-bar status: dot, HUD label, measured value. States ok (cyan), warn (amber), bad (red, dead link only).",
+      "html": "<div class=\"ds-ground\"><ul class=\"ds-chips\"><li class=\"ds-chip\" data-state=\"ok\"><span class=\"ds-chip-dot\"></span><span class=\"ds-chip-label\">Link</span><span class=\"ds-chip-value\">7 ms</span></li><li class=\"ds-chip\" data-state=\"warn\"><span class=\"ds-chip-dot\"></span><span class=\"ds-chip-label\">Model</span><span class=\"ds-chip-value\">server default</span></li><li class=\"ds-chip\" data-state=\"bad\"><span class=\"ds-chip-dot\"></span><span class=\"ds-chip-label\">Link</span><span class=\"ds-chip-value\">offline</span></li></ul></div>",
+      "css": ".ds-ground { background: var(--ground, #02060a); padding: 20px; color: var(--ink, #d8f6ff); font-family: var(--font, \"Saira\", system-ui, \"Segoe UI\", sans-serif); font-variant-numeric: tabular-nums; } .ds-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; } .ds-chip { display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px; border: 1px solid var(--line, rgba(90, 205, 255, 0.2)); background: var(--panel, rgba(8, 28, 40, 0.42)); white-space: nowrap; } .ds-chip-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3, #6fa3b6); } .ds-chip-label { font-size: 10.5px; color: var(--ink-3, #6fa3b6); font-stretch: 125%; text-transform: uppercase; letter-spacing: 0.14em; } .ds-chip-value { font-size: var(--fs-meta, 12.5px); color: var(--ink, #d8f6ff); max-width: 180px; overflow: hidden; text-overflow: ellipsis; } .ds-chip[data-state=\"ok\"] .ds-chip-dot { background: var(--signal, #3ad8ff); box-shadow: 0 0 8px var(--signal, #3ad8ff); } .ds-chip[data-state=\"warn\"] .ds-chip-dot { background: var(--amber, #ffb84d); box-shadow: 0 0 8px var(--amber, #ffb84d); } .ds-chip[data-state=\"warn\"] .ds-chip-value { color: var(--amber, #ffb84d); } .ds-chip[data-state=\"bad\"] .ds-chip-dot { background: var(--red, #ff6b76); box-shadow: 0 0 8px var(--red, #ff6b76); } .ds-chip[data-state=\"bad\"] .ds-chip-value { color: var(--red, #ff6b76); }"
+    },
+    {
+      "name": "Telemetry Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Bracketed glass panel with a HUD head, mono route, glowing readout and latency bars. Every value is measured.",
+      "html": "<div class=\"ds-ground\"><section class=\"ds-panel\"><h2 class=\"ds-panel-head\">Link <span class=\"ds-panel-sub\">/api/health</span></h2><div class=\"ds-readout\"><span class=\"ds-readout-value\">6.5</span><span class=\"ds-readout-unit\">ms</span></div><p class=\"ds-panel-note\">Backend round-trip, every 5 s</p><div class=\"ds-bars\"><span style=\"height:40%\"></span><span style=\"height:55%\"></span><span style=\"height:35%\"></span><span style=\"height:60%\"></span><span style=\"height:45%\"></span><span style=\"height:30%\"></span><span style=\"height:50%\"></span><span style=\"height:42%\"></span></div></section></div>",
+      "css": ".ds-ground { background: var(--ground, #02060a); padding: 20px; color: var(--ink, #d8f6ff); font-family: var(--font, \"Saira\", system-ui, \"Segoe UI\", sans-serif); font-variant-numeric: tabular-nums; } .ds-panel { position: relative; width: 260px; padding: 14px var(--pad, 16px) 16px; border: 1px solid var(--line, rgba(90, 205, 255, 0.2)); background: var(--panel, rgba(8, 28, 40, 0.42)); } .ds-panel::before, .ds-panel::after { content: \"\"; position: absolute; width: 10px; height: 10px; border: 0 solid var(--signal, #3ad8ff); pointer-events: none; } .ds-panel::before { top: -1px; left: -1px; border-top-width: 2px; border-left-width: 2px; } .ds-panel::after { right: -1px; bottom: -1px; border-right-width: 2px; border-bottom-width: 2px; } .ds-panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 0 0 10px; font-size: var(--fs-label, 11px); font-weight: 600; color: var(--ink-2, #8fc7da); font-stretch: 125%; text-transform: uppercase; letter-spacing: 0.14em; } .ds-panel-sub { font-family: var(--mono, ui-monospace, \"Cascadia Mono\", Consolas, monospace); font-stretch: normal; font-size: 11px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--ink-3, #6fa3b6); } .ds-readout { display: flex; align-items: baseline; gap: 6px; } .ds-readout-value { font-size: var(--fs-value, 34px); font-weight: 300; font-stretch: 112%; line-height: 1; color: var(--core, #eafcff); text-shadow: var(--glow, 0 0 14px rgba(58, 216, 255, 0.55)); } .ds-readout-unit { font-size: var(--fs-meta, 12.5px); color: var(--ink-2, #8fc7da); } .ds-panel-note { margin: 10px 0 0; font-size: var(--fs-meta, 12.5px); line-height: 1.45; color: var(--ink-3, #6fa3b6); } .ds-bars { display: flex; align-items: flex-end; gap: 2px; height: 34px; margin-top: 10px; border-bottom: 1px solid var(--line, rgba(90, 205, 255, 0.2)); } .ds-bars span { flex: 1; min-height: 2px; background: var(--signal-soft, rgba(58, 216, 255, 0.55)); } .ds-bars span:last-child { background: var(--signal, #3ad8ff); box-shadow: 0 0 6px var(--signal, #3ad8ff); }"
+    },
+    {
+      "name": "Waiting Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "A panel whose backend route doesn't exist yet: em dashes in ink 3 and an amber note naming the route and phase. Never invented numbers.",
+      "html": "<div class=\"ds-ground\"><section class=\"ds-panel ds-panel--waiting\"><h2 class=\"ds-panel-head\">Hardware <span class=\"ds-panel-sub\">/api/system</span></h2><dl class=\"ds-kv\"><div><dt>CPU</dt><dd>—</dd></div><div><dt>RAM</dt><dd>—</dd></div><div><dt>Logical cores</dt><dd>8 (browser)</dd></div></dl><p class=\"ds-panel-note ds-panel-note--warn\">Awaiting link. Build a <code>/api/system</code> route in Phase 3 and these fill in.</p></section></div>",
+      "css": ".ds-ground { background: var(--ground, #02060a); padding: 20px; color: var(--ink, #d8f6ff); font-family: var(--font, \"Saira\", system-ui, \"Segoe UI\", sans-serif); font-variant-numeric: tabular-nums; } .ds-panel { position: relative; width: 260px; padding: 14px var(--pad, 16px) 16px; border: 1px solid var(--line, rgba(90, 205, 255, 0.2)); background: var(--panel, rgba(8, 28, 40, 0.42)); } .ds-panel::before, .ds-panel::after { content: \"\"; position: absolute; width: 10px; height: 10px; border: 0 solid var(--signal, #3ad8ff); pointer-events: none; } .ds-panel::before { top: -1px; left: -1px; border-top-width: 2px; border-left-width: 2px; } .ds-panel::after { right: -1px; bottom: -1px; border-right-width: 2px; border-bottom-width: 2px; } .ds-panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 0 0 10px; font-size: var(--fs-label, 11px); font-weight: 600; color: var(--ink-2, #8fc7da); font-stretch: 125%; text-transform: uppercase; letter-spacing: 0.14em; } .ds-panel-sub { font-family: var(--mono, ui-monospace, \"Cascadia Mono\", Consolas, monospace); font-stretch: normal; font-size: 11px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--ink-3, #6fa3b6); } .ds-kv { display: grid; gap: 6px; margin: 0; } .ds-kv div { display: flex; justify-content: space-between; gap: 12px; } .ds-kv dt { font-size: var(--fs-meta, 12.5px); color: var(--ink-2, #8fc7da); } .ds-kv dd { margin: 0; font-size: 14px; color: var(--ink, #d8f6ff); } .ds-panel--waiting .ds-kv dd { color: var(--ink-3, #6fa3b6); } .ds-panel-note { margin: 10px 0 0; font-size: var(--fs-meta, 12.5px); line-height: 1.45; color: var(--ink-3, #6fa3b6); } .ds-panel-note--warn, .ds-panel-note--warn code { color: var(--amber, #ffb84d); } .ds-panel-note code { font-family: var(--mono, ui-monospace, Consolas, monospace); font-size: 11.5px; }"
+    },
+    {
+      "name": "Module Node",
+      "kind": "custom",
+      "refersTo": "node-online",
+      "description": "A module on the core's ring: online (core white with glow), stub (amber) or offline (ink 3, hollow dot). Lit only when the route answers.",
+      "html": "<div class=\"ds-ground\"><div class=\"ds-nodes\"><button class=\"ds-node\" data-status=\"online\" type=\"button\"><span class=\"ds-node-name\"><span class=\"ds-node-dot\"></span>Chat</span><span class=\"ds-node-phase\">Phase 1</span></button><button class=\"ds-node\" data-status=\"stub\" type=\"button\"><span class=\"ds-node-name\"><span class=\"ds-node-dot\"></span>Models</span><span class=\"ds-node-phase\">Phase 1 · 3</span></button><button class=\"ds-node\" data-status=\"offline\" type=\"button\" aria-expanded=\"true\"><span class=\"ds-node-name\"><span class=\"ds-node-dot\"></span>Tools</span><span class=\"ds-node-phase\">Phase 4</span></button></div></div>",
+      "css": ".ds-ground { background: var(--ground, #02060a); padding: 20px; color: var(--ink, #d8f6ff); font-family: var(--font, \"Saira\", system-ui, \"Segoe UI\", sans-serif); font-variant-numeric: tabular-nums; } .ds-nodes { display: flex; gap: 16px; } .ds-node { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 64px; padding: 5px 8px; border: 1px solid transparent; background: transparent; font-family: inherit; cursor: pointer; transition: transform 160ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)), border-color 160ms ease; } .ds-node:hover { border-color: var(--line, rgba(90, 205, 255, 0.2)); } .ds-node[aria-expanded=\"true\"] { border-color: var(--line-strong, rgba(110, 220, 255, 0.42)); } .ds-node:active { transform: scale(0.97); } .ds-node:focus-visible { outline: 2px solid var(--signal, #3ad8ff); outline-offset: 2px; } .ds-node-name { display: flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 600; color: var(--ink-3, #6fa3b6); font-stretch: 125%; text-transform: uppercase; letter-spacing: 0.14em; } .ds-node-dot { width: 6px; height: 6px; border: 1px solid currentColor; border-radius: 50%; } .ds-node-phase { font-size: 11px; color: var(--ink-3, #6fa3b6); } .ds-node[data-status=\"online\"] .ds-node-name { color: var(--core, #eafcff); text-shadow: var(--glow, 0 0 14px rgba(58, 216, 255, 0.55)); } .ds-node[data-status=\"online\"] .ds-node-dot { border-color: var(--signal, #3ad8ff); background: var(--signal, #3ad8ff); box-shadow: 0 0 8px var(--signal, #3ad8ff); } .ds-node[data-status=\"online\"] .ds-node-phase { color: var(--signal, #3ad8ff); } .ds-node[data-status=\"stub\"] .ds-node-name, .ds-node[data-status=\"stub\"] .ds-node-phase { color: var(--amber, #ffb84d); } .ds-node[data-status=\"stub\"] .ds-node-dot { background: var(--amber, #ffb84d); }"
+    },
+    {
+      "name": "Composer",
+      "kind": "input",
+      "refersTo": "composer",
+      "description": "Docked at the foot of the session log: line-strong frame that lights to signal with a ring and glow on focus.",
+      "html": "<div class=\"ds-ground\"><form class=\"ds-composer\" onsubmit=\"return false\"><textarea class=\"ds-composer-input\" rows=\"1\" placeholder=\"Message Atlas\" aria-label=\"Message\"></textarea><div class=\"ds-composer-bar\"><span class=\"ds-composer-model\">Model</span><span class=\"ds-composer-hint\">Enter to send · Shift+Enter for a new line</span><button class=\"ds-composer-send\" type=\"submit\">Transmit</button></div></form></div>",
+      "css": ".ds-ground { background: var(--ground, #02060a); padding: 20px; color: var(--ink, #d8f6ff); font-family: var(--font, \"Saira\", system-ui, \"Segoe UI\", sans-serif); font-variant-numeric: tabular-nums; } .ds-composer { width: 420px; max-width: 100%; border: 1px solid var(--line-strong, rgba(110, 220, 255, 0.42)); background: rgba(4, 18, 27, 0.9); transition: border-color 160ms ease, box-shadow 200ms ease; } .ds-composer:focus-within { border-color: var(--signal, #3ad8ff); box-shadow: 0 0 0 1px rgba(58, 216, 255, 0.4), 0 0 26px rgba(58, 216, 255, 0.14); } .ds-composer-input { display: block; width: 100%; box-sizing: border-box; padding: 12px 14px 6px; border: 0; background: transparent; color: var(--ink, #d8f6ff); font: inherit; font-size: var(--fs-body, 15px); line-height: 1.5; resize: none; caret-color: var(--signal, #3ad8ff); } .ds-composer-input:focus { outline: none; } .ds-composer-input::placeholder { color: var(--ink-3, #6fa3b6); } .ds-composer-bar { display: flex; align-items: center; gap: 10px; padding: 6px 8px 8px 14px; } .ds-composer-model { margin-right: auto; font-size: var(--fs-meta, 12.5px); color: var(--ink-3, #6fa3b6); } .ds-composer-hint { font-size: 12px; color: var(--ink-3, #6fa3b6); white-space: nowrap; } .ds-composer-send { min-height: 34px; padding: 0 14px; border: 1px solid var(--signal, #3ad8ff); border-radius: var(--radius, 2px); background: var(--signal, #3ad8ff); color: #01131c; font: inherit; font-size: var(--fs-label, 11px); font-weight: 600; font-stretch: 125%; text-transform: uppercase; letter-spacing: 0.14em; cursor: pointer; transition: transform 160ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)), background-color 160ms ease; } .ds-composer-send:hover { background: #7be6ff; } .ds-composer-send:active { transform: scale(0.97); } .ds-composer-send:focus-visible { outline: 2px solid var(--signal, #3ad8ff); outline-offset: 2px; }"
+    },
+    {
+      "name": "Session Messages",
+      "kind": "custom",
+      "refersTo": "message-user",
+      "description": "Session log turns: operator in a raised-tint box, Atlas as unframed reading text with a glowing name, Fault in amber with a plain-language fix.",
+      "html": "<div class=\"ds-ground\"><div class=\"ds-log\"><article class=\"ds-msg ds-msg--user\"><header class=\"ds-msg-head\"><span class=\"ds-msg-who\">Sigmar</span><time class=\"ds-msg-time\">17:00:38</time></header><div class=\"ds-msg-body\">Give me a status report</div></article><article class=\"ds-msg ds-msg--atlas\"><header class=\"ds-msg-head\"><span class=\"ds-msg-who\">Atlas</span><span class=\"ds-msg-meta\">qwen3:4b · 2.0 s · 33 chunks/s</span><time class=\"ds-msg-time\">17:00:38</time></header><div class=\"ds-msg-body\">All systems nominal.<span class=\"ds-caret\"></span></div></article><article class=\"ds-msg ds-msg--error\"><header class=\"ds-msg-head\"><span class=\"ds-msg-who\">Fault</span><time class=\"ds-msg-time\">17:01:02</time></header><div class=\"ds-msg-body\">Model 'qwen3:4b' isn't installed. Pull it with: ollama pull qwen3:4b<p class=\"ds-msg-raw\">Ollama error 404: {\"error\":\"model 'qwen3:4b' not found\"}</p></div></article></div></div>",
+      "css": ".ds-ground { background: var(--ground, #02060a); padding: 20px; color: var(--ink, #d8f6ff); font-family: var(--font, \"Saira\", system-ui, \"Segoe UI\", sans-serif); font-variant-numeric: tabular-nums; } .ds-log { width: 420px; max-width: 100%; } .ds-msg { margin: 0 0 22px; } .ds-msg-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; } .ds-msg-who { font-size: 10.5px; font-weight: 700; color: var(--ink-2, #8fc7da); font-stretch: 125%; text-transform: uppercase; letter-spacing: 0.14em; } .ds-msg--atlas .ds-msg-who { color: var(--signal, #3ad8ff); text-shadow: var(--glow, 0 0 14px rgba(58, 216, 255, 0.55)); } .ds-msg--error .ds-msg-who { color: var(--amber, #ffb84d); } .ds-msg-meta { font-size: 12px; color: var(--ink-3, #6fa3b6); } .ds-msg-time { margin-left: auto; font-size: 12px; color: var(--ink-3, #6fa3b6); } .ds-msg-body { font-size: var(--fs-body, 15px); line-height: 1.55; color: var(--ink, #d8f6ff); overflow-wrap: anywhere; } .ds-msg--user .ds-msg-body { padding: 10px 14px; border: 1px solid var(--line, rgba(90, 205, 255, 0.2)); background: var(--raised, rgba(57, 213, 255, 0.07)); white-space: pre-wrap; } .ds-msg--error .ds-msg-body { padding: 10px 14px; border: 1px solid rgba(255, 184, 77, 0.4); background: var(--amber-soft, rgba(255, 184, 77, 0.14)); color: #ffd9a1; } .ds-msg-raw { margin: 6px 0 0; font-family: var(--mono, ui-monospace, Consolas, monospace); font-size: 12px; color: #d9a866; } .ds-caret { display: inline-block; width: 0.55em; height: 1.05em; margin-left: 2px; vertical-align: -0.15em; background: var(--signal, #3ad8ff); box-shadow: 0 0 8px var(--signal, #3ad8ff); animation: ds-caret 1s steps(1) infinite; } @keyframes ds-caret { 50% { opacity: 0; } } @media (prefers-reduced-motion: reduce) { .ds-caret { animation: none; } }"
+    },
+    {
+      "name": "Plate",
+      "kind": "custom",
+      "refersTo": "panel",
+      "description": "The centred identity plate in the bottom strip: tracked HUD capitals with glow inside an open-topped trapezoid.",
+      "html": "<div class=\"ds-ground\"><div class=\"ds-plate\"><span>Atlas · Local Intelligence</span></div></div>",
+      "css": ".ds-ground { background: var(--ground, #02060a); padding: 20px; color: var(--ink, #d8f6ff); font-family: var(--font, \"Saira\", system-ui, \"Segoe UI\", sans-serif); font-variant-numeric: tabular-nums; } .ds-plate { position: relative; display: inline-block; padding: 6px 34px; font-size: 12px; font-weight: 600; font-stretch: 125%; text-transform: uppercase; letter-spacing: 0.3em; color: var(--core, #eafcff); text-shadow: var(--glow, 0 0 14px rgba(58, 216, 255, 0.55)); } .ds-plate::before { content: \"\"; position: absolute; inset: 0; border: 1px solid var(--line-strong, rgba(110, 220, 255, 0.42)); border-top: 0; background: rgba(58, 216, 255, 0.05); transform: perspective(40px) rotateX(-6deg); transform-origin: top; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Honest Hologram",
+    "overview": "Atlas is a heads-up display projected onto a blue-black table: a faint 32px grid, light falling off from just left of centre, and every structure drawn in translucent cyan light rather than grey. At its centre sits the core, a stack of concentric rings that is the model made visible. It sweeps a scan arc while the model thinks, surges with every streamed chunk, spins faster with the measured stream rate, and stops dead when the backend is gone. Ten module nodes sit on its outer ring and light up only when their backend routes really exist. The spectacle is real telemetry in costume.\n\nDensity is instrument-panel high at the edges (telemetry rail, status chips, a strip of traffic numbers) and calm where reading happens. The session log on the right is a darker, quieter frame with normal-width 15px type, so a reply stays comfortable to read beside the turning core. The owner's binding reference is the cinematic holographic HUD: cyan on black, a circular core, dense panels and a boot sequence. Atlas builds its own HUD from that grammar and copies no film props or studio marks.\n\nThe world rejects the category default for chat, a conversation sidebar beside a centred transcript. Chat is the job, and it lives in the right-hand log next to the instrument that shows the model working.",
+    "keyCharacteristics": [
+      "One hue family (cyan, roughly 209–239° in OKLCH) on a near-black ground; amber and red are status voices only.",
+      "Structure in light: 1px translucent cyan frames, with brighter 2px corner brackets on instrument regions.",
+      "One variable typeface, Saira, in two widths: expanded tracked capitals for labels, normal width for reading.",
+      "Glow is emission. It belongs to the core, the identity marks, the clock, live values and lit status.",
+      "The core's ring speed is coupled to app state and to the measured stream rate.",
+      "Every number is measured, labelled as an estimate, or an em dash that names the route it is waiting for."
+    ],
+    "rules": [
+      {
+        "name": "The Structure-in-Light Rule",
+        "body": "Frames, dividers, meter tracks and scrollbars are cyan at reduced alpha (line at 20%, line-strong at 42%). There are no grey borders anywhere in the world.",
+        "section": "colors"
+      },
+      {
+        "name": "The Status Voice Rule",
+        "body": "Cyan means live and answering. Amber means it exists but isn't working (stub, waiting, warning, fault, offline core). Red is only a dead Link chip. Amber and red are never decorative.",
+        "section": "colors"
+      },
+      {
+        "name": "The Contrast Floor Rule",
+        "body": "Every ink token clears 4.5:1 on the ground and on panel glass. Ink 3, the faintest, measures about 7.3:1 on the ground and 5.4:1 on the raised tint. New text colours meet the same floor.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Widths Rule",
+        "body": "Expanded tracked capitals are for labels only: panel heads, chip labels, buttons, speaker names, node names, the core state, the wordmark and the plate. Anything a person reads as a sentence is normal width and sentence case.",
+        "section": "typography"
+      },
+      {
+        "name": "The Real Spelling Rule",
+        "body": "API routes and file paths keep their real, case-sensitive spelling in mono, even inside an uppercase HUD label (panel subheads, boot log lines, popover paths).",
+        "section": "typography"
+      },
+      {
+        "name": "The Log Keeps Its Height Rule",
+        "body": "When width runs out, telemetry moves into the Systems sheet before the session log gives up any height. The log and composer are never pushed below the fold.",
+        "section": "layout"
+      },
+      {
+        "name": "The Emission-Not-Elevation Rule",
+        "body": "Cyan glow marks light that is live: the core, the identity marks, the clock, measured values and online modules. Body text, panel heads and static frames never glow.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Floating-Goes-Opaque Rule",
+        "body": "Only the popover and the Systems sheet carry a dark drop shadow, and both switch to an opaque fill (panel solid or ground) so their text never sits over the turning rings.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Bracket Placement Rule",
+        "body": "Corner brackets mark instrument regions: a diagonal pair on telemetry panels, one top-left bracket on the session log, arcs on the core. Chips, buttons, messages and the popover carry plain 1px frames.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Honest Readout Rule",
+        "body": "A value is measured; or labelled as an estimate (\"≈\", \"estimated\", \"(browser)\"); or an em dash with a note naming the route and phase that will supply it. There are no placeholder numbers and no simulated graphs.",
+        "section": "components"
+      },
+      {
+        "name": "The Coupled Rotation Rule",
+        "body": "The core's speed is the app's state plus the measured stream rate, never a decorative speed-up. A dead link stops the rings dead.",
+        "section": "components"
+      },
+      {
+        "name": "The Lit-Only-When-Built Rule",
+        "body": "A node turns cyan only when its route answers. There is no \"coming soon\" glow.",
+        "section": "components"
+      },
+      {
+        "name": "The Still-But-Readable Rule",
+        "body": "With reduced motion nothing rotates or travels across the screen, but every state still reads through colour and brightness.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "**Do** draw every frame and divider in cyan light: line (rgba(90, 205, 255, 0.2)) by default, line-strong (rgba(110, 220, 255, 0.42)) for controls and floating layers.",
+      "**Do** set labels in Saira at 125% width, uppercase, 0.14em tracking, and set everything people read at normal width in sentence case.",
+      "**Do** keep API routes and file paths in mono with their real casing.",
+      "**Do** show a missing value as an em dash with a note naming the route and phase that will supply it, and label estimates as estimates.",
+      "**Do** drive any new core behaviour from measured data through the state speed table, never from a decorative timer.",
+      "**Do** use amber for anything that exists but isn't working yet, and keep red for a dead link.",
+      "**Do** give floating layers an opaque fill and the dark drop shadow, and keep in-flow panels translucent and shadowless.",
+      "**Do** keep hover styles inside `(hover: hover) and (pointer: fine)` and give every pressable element a press scale (0.97 for buttons and nodes)."
+    ],
+    "donts": [
+      "**Don't** add grey borders, grey text or an untinted neutral; every neutral in the world leans toward the cyan hue.",
+      "**Don't** invent numbers, sparklines or simulated telemetry to fill a panel.",
+      "**Don't** light a module node cyan before its route answers.",
+      "**Don't** add glow to body text, panel heads or static frames.",
+      "**Don't** introduce rounded cards, pill buttons or large radii; the world is square, with a 2px concession on controls.",
+      "**Don't** let the spectacle cover the log: the session log and composer never lose height to telemetry, and rings, beams and pulses stop at the log's frame.",
+      "**Don't** add a second display or body typeface; Saira's width axis carries the hierarchy, and mono is for code and routes only.",
+      "**Don't** rebuild the chat as a conversation sidebar beside a centred transcript."
+    ]
+  }
+}

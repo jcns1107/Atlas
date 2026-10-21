@@ -26,7 +26,7 @@ class Settings(BaseSettings):
 
     # Ollama
     ollama_base_url: str = "http://localhost:11434"
-    ollama_default_model: str = "qwen3:4b"
+    ollama_default_model: str = "qwen3:1.7b"
     ollama_embed_model: str = "embeddinggemma"
     # Ollama's default window is small and overflow is cut silently, so we
     # always send num_ctx explicitly (see core/context/ for the budget logic).

@@ -23,11 +23,35 @@ Right now it returns 501 so the app still boots and the route shows up in /docs.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+import json
+
+from fastapi import APIRouter
+from fastapi.responses import StreamingResponse
+
+from backend.core.llm.base import ChatProvider
+from backend.core.llm.ollama_provider import OllamaProvider
+from backend.schemas.chat import ChatRequest
 
 router = APIRouter(tags=["chat"])
 
+provider: ChatProvider = OllamaProvider()
+
 
 @router.post("/chat")
-async def chat():
-    raise HTTPException(status_code=501, detail="Not implemented yet — see GUIDE.md Phase 1.")
+async def chat(req: ChatRequest) -> StreamingResponse:
+    """Accept a list of messages, send them to the model, and stream the reply back."""
+
+    async def event_stream():
+        # Each SSE frame carries ONE line of JSON. Raw text would break the
+        # framing: model chunks often contain "\n" (new paragraphs), and SSE
+        # treats a blank line as "end of event" — so the newlines got lost.
+        # json.dumps escapes them, and the `kind` field gets the frontend ready
+        # for Phase 4 (thinking / tool_call events ride the same stream).
+        try:
+            async for chunk in provider.stream_chat(req.messages, req.model):
+                yield f"data: {json.dumps({'kind': 'text', 'text': chunk})}\n\n"
+        except Exception as exc:  # `exc`, not `exec` — that name is a Python builtin
+            yield f"data: {json.dumps({'kind': 'error', 'message': str(exc)})}\n\n"
+        yield f"data: {json.dumps({'kind': 'done'})}\n\n"
+
+    return StreamingResponse(event_stream(), media_type="text/event-stream")

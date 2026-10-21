@@ -2,25 +2,252 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#02060a" />
     <title>Atlas</title>
+    <link rel="preload" href="/static/fonts/saira-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/static/css/styles.css" />
+    <!-- The boot sequence runs once per browser session. This tiny inline check
+         hides the HUD before first paint so it never flashes in before the boot. -->
+    <script>
+      try {
+        if (!sessionStorage.getItem("atlas.booted")) document.documentElement.classList.add("will-boot");
+      } catch (e) {}
+    </script>
   </head>
   <body>
-    <!--
-      This is YOUR UI to design (GUIDE.md, Phases 1-2).
+    <!-- ============================================================
+         BOOT OVERLAY — plays once per session (Alt+Shift+B replays it)
+         ============================================================ -->
+    <div class="boot" id="boot" aria-hidden="true">
+      <ol class="boot__log" id="boot-log"></ol>
+      <p class="boot__skip">Click or press any key to skip</p>
+    </div>
 
-      A chat interface usually needs:
-        - a scrollable area to show the conversation
-        - a text input + a send button
-        - a dropdown to pick the model
+    <div class="hud" id="hud">
+      <!-- ============================================================
+           TOP BAR
+           ============================================================ -->
+      <header class="topbar" data-reveal>
+        <div class="brand">
+          <span class="brand__mark" aria-hidden="true">
+            <svg viewBox="-12 -12 24 24"><circle r="10" /><circle r="5.5" /><path d="M0 -10V-5.5M0 5.5V10M-10 0H-5.5M5.5 0H10" /></svg>
+          </span>
+          <span class="brand__name">Atlas</span>
+          <span class="brand__ver" id="version">OS</span>
+        </div>
 
-      Build the markup here, style it in css/styles.css, and wire it to the
-      backend in js/app.js (which calls GET /api/models and POST /api/chat).
-    -->
-    <h1>🧭 Atlas</h1>
-    <p>Start building your interface here.</p>
+        <ul class="status" aria-label="System status">
+          <li class="chip" id="chip-link" data-state="pending">
+            <span class="chip__dot" aria-hidden="true"></span>
+            <span class="chip__label">Link</span>
+            <span class="chip__value" id="chip-link-value">checking</span>
+          </li>
+          <li class="chip" id="chip-model" data-state="pending">
+            <span class="chip__dot" aria-hidden="true"></span>
+            <span class="chip__label">Model</span>
+            <span class="chip__value" id="chip-model-value">server default</span>
+          </li>
+          <li class="chip" id="chip-modules">
+            <span class="chip__dot" aria-hidden="true"></span>
+            <span class="chip__label">Modules</span>
+            <span class="chip__value" id="chip-modules-value">0 / 10</span>
+          </li>
+        </ul>
 
-    <script src="/static/js/app.js"></script>
+        <div class="operator">
+          <span class="operator__label">Operator</span>
+          <span class="operator__name" id="operator-name">Sigmar</span>
+        </div>
+
+        <div class="clock" aria-live="off">
+          <time class="clock__time" id="clock-time">00:00:00</time>
+          <span class="clock__date" id="clock-date">&nbsp;</span>
+        </div>
+
+        <button class="btn btn--ghost systems-toggle" id="systems-toggle" type="button" aria-expanded="false" aria-controls="rail">
+          Systems
+        </button>
+      </header>
+
+      <!-- ============================================================
+           LEFT RAIL — telemetry (real data only)
+           ============================================================ -->
+      <aside class="rail" id="rail" aria-label="Telemetry">
+        <section class="panel" data-reveal aria-labelledby="p-link">
+          <h2 class="panel__head" id="p-link">Link <span class="panel__sub">/api/health</span></h2>
+          <div class="readout">
+            <span class="readout__value" id="link-latency">—</span>
+            <span class="readout__unit">ms</span>
+          </div>
+          <p class="panel__note" id="link-note">Backend round-trip, every 5 s</p>
+          <div class="bars" id="link-bars" aria-hidden="true"></div>
+        </section>
+
+        <section class="panel" data-reveal aria-labelledby="p-stream">
+          <h2 class="panel__head" id="p-stream">Stream <span class="panel__sub panel__sub--text">last reply</span></h2>
+          <dl class="kv">
+            <div><dt>First token</dt><dd id="st-ttft">—</dd></div>
+            <div><dt>Rate</dt><dd id="st-rate">—</dd></div>
+            <div><dt>Duration</dt><dd id="st-dur">—</dd></div>
+            <div><dt>Chunks</dt><dd id="st-chunks">—</dd></div>
+          </dl>
+          <div class="bars bars--stream" id="st-bars" aria-hidden="true"></div>
+          <p class="panel__caption" id="st-caption">Chunk arrival, last reply</p>
+          <p class="panel__note" id="st-note">Send a message to measure the model.</p>
+        </section>
+
+        <section class="panel" data-reveal aria-labelledby="p-session">
+          <h2 class="panel__head" id="p-session">Session <span class="panel__sub panel__sub--text">in memory</span></h2>
+          <dl class="kv">
+            <div><dt>Messages</dt><dd id="ss-msgs">0</dd></div>
+            <div><dt>Uptime</dt><dd id="ss-uptime">00:00:00</dd></div>
+          </dl>
+          <div class="meter" aria-labelledby="ss-ctx-label">
+            <div class="meter__row">
+              <span id="ss-ctx-label">Context, estimated</span>
+              <span class="meter__value" id="ss-ctx">≈ 0 / 8,192</span>
+            </div>
+            <div class="meter__track"><div class="meter__fill" id="ss-ctx-fill"></div></div>
+          </div>
+        </section>
+
+        <section class="panel panel--waiting" data-reveal aria-labelledby="p-hw">
+          <h2 class="panel__head" id="p-hw">Hardware <span class="panel__sub">/api/system</span></h2>
+          <dl class="kv">
+            <div><dt>CPU</dt><dd>—</dd></div>
+            <div><dt>RAM</dt><dd>—</dd></div>
+            <div><dt>GPU / VRAM</dt><dd>—</dd></div>
+            <div><dt>Logical cores</dt><dd id="hw-cores">—</dd></div>
+          </dl>
+          <p class="panel__note panel__note--warn">Awaiting link. Build a <code>/api/system</code> route in Phase 3 and these fill in.</p>
+        </section>
+      </aside>
+
+      <!-- ============================================================
+           CENTRE STAGE — the core + module ring
+           ============================================================ -->
+      <main class="stage" id="stage">
+        <div class="beam beam--a" aria-hidden="true"><span class="beam__pulse"></span></div>
+        <div class="beam beam--b" aria-hidden="true"><span class="beam__pulse"></span></div>
+
+        <!-- Each ring is its own <svg> layer so the browser can rotate it on the
+             GPU (a CSS transform on the element) instead of repainting the
+             whole drawing every frame. js/core.js fills in the ticks and blades. -->
+        <div class="core" id="core" data-state="standby">
+          <div class="core__bloom" id="core-bloom" aria-hidden="true"></div>
+          <div class="core__layers" aria-hidden="true">
+            <svg class="layer layer--static" viewBox="-300 -300 600 600">
+              <defs>
+                <radialGradient id="disc-fill">
+                  <stop offset="0" stop-color="#f2fdff" stop-opacity="1" />
+                  <stop offset="0.45" stop-color="#9beeff" stop-opacity="0.85" />
+                  <stop offset="0.8" stop-color="#2bb6e0" stop-opacity="0.3" />
+                  <stop offset="1" stop-color="#0a5a7a" stop-opacity="0" />
+                </radialGradient>
+              </defs>
+              <circle class="s-well" r="236" />
+              <circle class="s-faint" r="292" />
+              <g class="s-brackets">
+                <path d="M -191 -191 A 270 270 0 0 1 -150 -224" />
+                <path d="M 191 -191 A 270 270 0 0 1 224 -150" />
+                <path d="M 191 191 A 270 270 0 0 1 150 224" />
+                <path d="M -191 191 A 270 270 0 0 1 -224 150" />
+              </g>
+              <circle class="s-ctx-track" r="178" />
+              <circle class="s-ctx" id="core-ctx" r="178" pathLength="100" />
+              <circle class="s-inner" r="96" />
+              <circle class="s-inner s-inner--b" r="74" />
+            </svg>
+            <svg class="layer layer--ticks" id="ring-ticks" viewBox="-300 -300 600 600"></svg>
+            <svg class="layer layer--segments" id="ring-segments" viewBox="-300 -300 600 600">
+              <circle class="seg-base" r="224" pathLength="360" />
+              <circle class="seg-hot" r="224" pathLength="360" />
+            </svg>
+            <svg class="layer layer--data" id="ring-data" viewBox="-300 -300 600 600">
+              <circle class="data-thin" r="200" />
+              <circle class="data-arc" r="200" pathLength="360" />
+            </svg>
+            <svg class="layer layer--iris" id="ring-iris" viewBox="-300 -300 600 600"></svg>
+            <svg class="layer layer--scan" id="ring-scan" viewBox="-300 -300 600 600">
+              <circle r="142" pathLength="360" />
+            </svg>
+            <svg class="layer layer--disc" id="core-disc" viewBox="-300 -300 600 600">
+              <circle r="118" fill="url(#disc-fill)" />
+            </svg>
+          </div>
+
+          <div class="core__readout" aria-live="polite">
+            <span class="core__state" id="core-state">Standby</span>
+            <span class="core__detail" id="core-detail">Awaiting command</span>
+          </div>
+
+          <!-- Module nodes are buttons placed around the ring by js/modules.js -->
+          <ul class="nodes" id="nodes" aria-label="Atlas modules"></ul>
+        </div>
+
+        <div class="popover" id="popover" role="dialog" aria-modal="false" aria-labelledby="pop-title" hidden>
+          <h3 class="popover__title" id="pop-title"></h3>
+          <p class="popover__status" id="pop-status"></p>
+          <p class="popover__text" id="pop-text"></p>
+          <p class="popover__path"><code id="pop-path"></code></p>
+        </div>
+      </main>
+
+      <!-- ============================================================
+           RIGHT — session log (transcript) + composer
+           ============================================================ -->
+      <section class="comms" aria-labelledby="comms-title" data-reveal>
+        <header class="comms__head">
+          <h1 class="comms__title" id="comms-title">Session log</h1>
+          <span class="comms__count" id="comms-count">No messages</span>
+          <button class="btn btn--ghost" id="new-session" type="button">New session</button>
+        </header>
+
+        <div class="log" id="log" role="log" aria-live="polite" aria-relevant="additions">
+          <div class="empty" id="empty">
+            <p class="empty__title">Channel open. Nothing transmitted yet.</p>
+            <p class="empty__text">Ask Atlas anything. Replies stream from your local model through <code>/api/chat</code>.</p>
+            <div class="empty__prompts">
+              <button class="prompt" type="button">Run a quick systems check and tell me which model you are.</button>
+              <button class="prompt" type="button">Explain what num_ctx does in Ollama, in three sentences.</button>
+              <button class="prompt" type="button">Write a Python function that streams lines from a file.</button>
+            </div>
+          </div>
+        </div>
+
+        <form class="composer" id="composer" autocomplete="off">
+          <label class="sr-only" for="input">Message</label>
+          <textarea class="composer__input" id="input" rows="1" placeholder="Message Atlas" spellcheck="true"></textarea>
+          <div class="composer__bar">
+            <label class="composer__model">
+              <span>Model</span>
+              <select id="model"><option value="">Server default</option></select>
+            </label>
+            <span class="composer__hint">Enter to send · Shift+Enter for a new line</span>
+            <button class="btn btn--primary" id="send" type="submit">Transmit</button>
+            <button class="btn btn--stop" id="stop" type="button" hidden>Stop</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ============================================================
+           BOTTOM STRIP
+           ============================================================ -->
+      <footer class="strip" data-reveal>
+        <p class="strip__traffic">
+          Chat traffic <span class="strip__num" id="traffic-in">In 0 B</span>
+          <span class="strip__num" id="traffic-out">Out 0 B</span>
+        </p>
+        <div class="plate" aria-hidden="true"><span>Atlas · Local Intelligence</span></div>
+        <p class="strip__right">
+          <button class="btn btn--link" id="reboot" type="button">Reboot</button>
+          <kbd>Alt</kbd><kbd>Shift</kbd><kbd>B</kbd>
+        </p>
+      </footer>
+    </div>
+
+    <script type="module" src="/static/js/app.js"></script>
   </body>
 </html>
