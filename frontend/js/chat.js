@@ -304,10 +304,6 @@ export function createChat({ core, telemetry, getModel, onStreamActivity }) {
   });
   stopBtn.addEventListener("click", () => controller?.abort());
 
-  // Suggested prompts in the empty state fill the composer and send.
-  empty.querySelectorAll(".prompt").forEach((btn) =>
-    btn.addEventListener("click", () => send(btn.textContent)),
-  );
 
   // Copy buttons on code blocks (event delegation: blocks are created later).
   log.addEventListener("click", async (e) => {

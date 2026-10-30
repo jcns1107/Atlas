@@ -1,14 +1,17 @@
-// core.js — the HUD's centre: rotating rings that react to the model.
+// core.js — the HUD's centre: a holographic Earth inside rotating rings,
+// all reacting to the model. (The Earth itself is drawn by globe.js.)
 //
 // The signature idea: the core is driven by REAL stream data.
 //   - waiting for the first token → a bright scan arc sweeps the inner ring
-//   - streaming → every chunk that arrives pumps the disc's brightness, and
-//     the rings spin faster the more chunks per second the model produces
+//   - streaming → every chunk makes the Earth "talk" (ripples + voice bars),
+//     and the rings spin faster the more chunks per second the model produces
 //   - backend unreachable → the rings stop and the core greys out
 //
 // Each ring is a separate <svg> element rotated with the Web Animations API.
 // Rotating a whole element is done by the GPU; animating shapes *inside* one
 // SVG would make the browser repaint the drawing every frame.
+
+import { createGlobe } from "./globe.js";
 
 const SVG = "http://www.w3.org/2000/svg";
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -20,7 +23,6 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 const RINGS = [
   { id: "ring-ticks", period: 140_000, dir: 1, coupled: true },
   { id: "ring-segments", period: 90_000, dir: -1, coupled: true },
-  { id: "ring-data", period: 46_000, dir: 1, coupled: true },
   { id: "ring-scan", period: 1_100, dir: 1, coupled: false },
 ];
 
@@ -52,7 +54,7 @@ export function createCore() {
   const root = document.getElementById("core");
   const stateEl = document.getElementById("core-state");
   const detailEl = document.getElementById("core-detail");
-  const disc = document.getElementById("core-disc");
+  const globe = createGlobe(document.getElementById("globe"));
   const bloom = document.getElementById("core-bloom");
   const ctxArc = document.getElementById("core-ctx");
 
@@ -62,8 +64,6 @@ export function createCore() {
     const major = i % 10 === 0;
     line(ticks, 246, major ? 266 : 256, i * 3, major ? "major" : "");
   }
-  const iris = document.getElementById("ring-iris");
-  for (let i = 0; i < 60; i++) line(iris, 152, 166, i * 6);
 
   // One looping rotation per ring; afterwards we only ever change its speed.
   const anims = RINGS.map(({ id, period, dir }) =>
@@ -100,18 +100,16 @@ export function createCore() {
   reduceMotion.addEventListener("change", applyMotionPreference);
 
   // One small animation loop that runs only while something is changing:
-  // ease the ring speed toward its target and let the disc's energy decay.
+  // ease the ring speed toward its target and let the bloom's energy decay.
   function tick() {
     speed += (target - speed) * 0.06;
     energy *= 0.9;
     if (!reduceMotion.matches) {
       applyRate(speed);
-      disc.style.transform = `scale(${1 + energy * 0.05})`;
-      bloom.style.transform = `scale(${0.92 + energy * 0.3})`;
+      bloom.style.transform = `scale(${0.95 + energy * 0.15})`;
     }
     // Brightness carries the pulse even with reduced motion (no movement).
-    disc.style.opacity = String(0.82 + energy * 0.18);
-    bloom.style.opacity = String(0.18 + energy * 0.7);
+    bloom.style.opacity = String(0.25 + energy * 0.6);
 
     const settled = Math.abs(target - speed) < 0.01 && energy < 0.01;
     if (settled) {
@@ -137,6 +135,7 @@ export function createCore() {
       stateEl.textContent = LABELS[next] ?? next;
       if (detail !== undefined) detailEl.textContent = detail;
       target = SPEED[next] ?? 1;
+      globe.setMode(next, 1 + (target - 1) * 0.35);
       if (next === "offline") {
         // Stop dead (no easing): a dead link should look dead.
         speed = 0;
@@ -152,6 +151,7 @@ export function createCore() {
     /** Called for every streamed chunk: a small surge of light. */
     pulse() {
       energy = Math.min(1, energy + 0.14);
+      globe.pulse();
       kick();
     },
 
@@ -159,6 +159,7 @@ export function createCore() {
     setRate(chunksPerSecond) {
       if (state !== "streaming") return;
       target = SPEED.streaming + Math.min(chunksPerSecond / 8, 6);
+      globe.setSpeed(1 + (target - 1) * 0.35); // the Earth turns faster, but stays calm
       kick();
     },
 

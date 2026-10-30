@@ -1,9 +1,9 @@
 // boot.js — the start-up sequence (once per browser session).
 //
-// The real core flies to the middle of the screen, its rings open from the
-// centre outward while the boot log runs real checks (backend link, model
-// list, modules), then it glides back to its place and the panels draw in
-// around it. Click or press any key to skip; Alt+Shift+B replays it.
+// The real core flies to the middle of the screen, its rings and the Earth
+// open from the centre outward while the boot log runs real checks (backend
+// link, model list, modules), then it glides back to its place and the chat
+// draws in under it. Click or press any key to skip; Alt+Shift+B replays it.
 //
 // The "fly to the middle and back" trick is called FLIP: measure where the
 // element really is, move it somewhere else with a transform, then animate the
@@ -40,7 +40,7 @@ export async function runBoot(steps, { core } = {}) {
   const coreEl = document.getElementById("core");
   const rm = reduceMotion();
 
-  document.body.classList.remove("systems-open");
+  document.body.classList.remove("drawer-open");
   logEl.innerHTML = "";
   boot.classList.remove("is-leaving");
   html.classList.remove("will-boot");
@@ -59,7 +59,7 @@ export async function runBoot(steps, { core } = {}) {
 
   // The rings open from the centre outward, one after another.
   if (!rm) {
-    coreEl.querySelectorAll(".layer, .core__bloom, .core__readout").forEach((el, i) =>
+    coreEl.querySelectorAll(".layer, .core__bloom").forEach((el, i) =>
       el.animate(
         [
           { clipPath: "circle(0% at 50% 50%)", opacity: 0 },
@@ -117,8 +117,8 @@ export async function runBoot(steps, { core } = {}) {
       easing: EASE_IN_OUT,
     });
   }
-  hud.querySelectorAll("[data-reveal], .nodes, .beam").forEach((el, i) =>
-    el.style.setProperty("--i", i + 4),
+  hud.querySelectorAll(".readout, [data-reveal]").forEach((el, i) =>
+    el.style.setProperty("--i", i + 3),
   );
   hud.classList.add("is-revealing");
   html.classList.remove("booting");

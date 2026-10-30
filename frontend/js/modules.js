@@ -1,6 +1,6 @@
-// modules.js — the ring of Atlas modules around the core.
+// modules.js — Atlas's modules, listed in the Systems drawer.
 //
-// Each node lights up by itself as you build the backend:
+// Each module lights up by itself as you build the backend:
 //   offline → the route doesn't exist yet (not in /openapi.json)
 //   stub    → the route exists but answers 501 "Not implemented"
 //   online  → the route exists and works
@@ -115,142 +115,61 @@ export async function detectStatuses(spec, probe) {
   );
 }
 
-export function createModuleRing({ onSelect } = {}) {
-  const list = document.getElementById("nodes");
-  const stage = document.getElementById("stage");
-  const pop = document.getElementById("popover");
+/**
+ * The module list inside the Systems drawer. Each row expands to say what the
+ * module is, its phase and where in the repo it gets built.
+ */
+export function createModuleList() {
+  const list = document.getElementById("modules-list");
   const statuses = Object.fromEntries(MODULES.map((m) => [m.id, "offline"]));
-  let openId = null;
 
-  // Place the nodes evenly around the ring, starting at the top, clockwise,
-  // each with a short leader tick from the outer ring (drawn in the SVG).
-  const RADIUS = 46.5; // % of the core's width: just outside the tick ring
-  const staticSvg = document.querySelector(".layer--static");
-  MODULES.forEach((mod, i) => {
-    const angle = ((-90 + (360 / MODULES.length) * i) * Math.PI) / 180;
-    const leader = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    leader.setAttribute("x1", (Math.cos(angle) * 268).toFixed(1));
-    leader.setAttribute("y1", (Math.sin(angle) * 268).toFixed(1));
-    leader.setAttribute("x2", (Math.cos(angle) * 280).toFixed(1));
-    leader.setAttribute("y2", (Math.sin(angle) * 280).toFixed(1));
-    leader.setAttribute("class", "s-leader");
-    leader.dataset.id = mod.id;
-    staticSvg.append(leader);
-    const li = document.createElement("li");
-    li.className = "node";
-    li.dataset.id = mod.id;
-    li.dataset.status = "offline";
-    const cos = Math.cos(angle);
-    const sin = Math.sin(angle);
-    li.style.left = `${50 + cos * RADIUS}%`;
-    li.style.top = `${50 + sin * RADIUS}%`;
-    // Shift each label outward so its inner edge touches the orbit instead of
-    // its centre: labels on the sides then never sit on the tick ring.
-    li.style.transform = `translate(${-50 + 50 * cos}%, ${-50 + 50 * sin}%)`;
-    li.dataset.side = Math.abs(cos) < 0.35 ? "centre" : cos > 0 ? "right" : "left";
-    li.innerHTML = `
-      <button class="node__btn" type="button" aria-expanded="false" aria-controls="popover">
-        <span class="node__name"><span class="node__dot" aria-hidden="true"></span>${mod.name}</span>
-        <span class="node__phase">${mod.phase}</span>
-      </button>`;
-    li.querySelector("button").addEventListener("click", (e) => {
-      e.stopPropagation();
-      openId === mod.id ? close() : open(mod.id);
-      onSelect?.(mod.id);
-    });
-    list.append(li);
-  });
-
-  // Mobile: the same modules as a plain list inside the Systems sheet.
-  const mobilePanel = document.createElement("section");
-  mobilePanel.className = "panel panel--modules";
-  mobilePanel.innerHTML = `<h2 class="panel__head">Modules</h2><ul class="modules-list"></ul>`;
-  document.getElementById("rail").append(mobilePanel);
-  const mobileList = mobilePanel.querySelector("ul");
-
-  function renderMobileList() {
-    mobileList.innerHTML = MODULES.map(
-      (m) =>
-        `<li data-status="${statuses[m.id]}"><span>${m.name}</span><span>${
-          statuses[m.id] === "offline" ? m.phase : STATUS_TEXT[statuses[m.id]]
-        }</span></li>`,
-    ).join("");
+  function detailText(mod, status) {
+    if (status === "online") return `${mod.blurb} Built and answering at ${mod.route}.`;
+    if (status === "stub") return `${mod.blurb} The route is registered; finish the TODO and it comes online.`;
+    return mod.blurb;
   }
 
-  function open(id) {
-    const mod = MODULES.find((m) => m.id === id);
-    const status = statuses[id];
-    const node = list.querySelector(`[data-id="${id}"]`);
-    list.querySelectorAll(".node__btn").forEach((b) => b.setAttribute("aria-expanded", "false"));
-    node.querySelector("button").setAttribute("aria-expanded", "true");
-
-    document.getElementById("pop-title").textContent = mod.name;
-    const statusEl = document.getElementById("pop-status");
-    statusEl.dataset.status = status;
-    statusEl.textContent = status === "offline" ? `${STATUS_TEXT.offline} · ${mod.phase}` : STATUS_TEXT[status];
-    document.getElementById("pop-text").textContent =
-      status === "online"
-        ? `${mod.blurb} Built and answering at ${mod.route}.`
-        : status === "stub"
-          ? `${mod.blurb} The route is registered; finish the TODO and it comes online.`
-          : mod.blurb;
-    document.getElementById("pop-path").textContent = mod.build;
-
-    // Position next to the node, growing from it. Nodes on the sides open
-    // outward (away from the core's readout); top and bottom nodes open
-    // toward the centre, which leaves the readout clear.
-    pop.hidden = false;
-    const s = stage.getBoundingClientRect();
-    const n = node.getBoundingClientRect();
-    const nx = n.left + n.width / 2 - s.left;
-    const ny = n.top + n.height / 2 - s.top;
-    const side = Math.abs(nx - s.width / 2) > s.width * 0.2;
-    const above = ny < s.height / 2;
-    const below = side ? !above : above;
-    let left = side ? (nx < s.width / 2 ? n.right - s.left - 280 : n.left - s.left) : nx - 140;
-    left = Math.min(Math.max(left, 8), s.width - 288);
-    const top = below ? n.bottom - s.top + 8 : n.top - s.top - pop.offsetHeight - 8;
-    pop.style.left = `${left}px`;
-    pop.style.top = `${Math.max(8, top)}px`;
-    pop.style.setProperty("--origin", `${nx - left}px ${below ? "0" : "100%"}`);
-    pop.dataset.starting = "";
-    requestAnimationFrame(() => delete pop.dataset.starting);
-    openId = id;
+  function render() {
+    list.innerHTML = "";
+    for (const mod of MODULES) {
+      const status = statuses[mod.id];
+      const li = document.createElement("li");
+      li.className = "mod";
+      li.dataset.status = status;
+      li.innerHTML = `
+        <button class="mod__row" type="button" aria-expanded="false">
+          <span class="mod__dot" aria-hidden="true"></span>
+          <span class="mod__name"></span>
+          <span class="mod__status"></span>
+          <svg class="chev" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 1.5 6.5 5 3 8.5"/></svg>
+        </button>
+        <div class="mod__detail" hidden>
+          <p></p>
+          <code></code>
+        </div>`;
+      li.querySelector(".mod__name").textContent = mod.name;
+      li.querySelector(".mod__status").textContent =
+        status === "offline" ? mod.phase : STATUS_TEXT[status].split(" ·")[0];
+      li.querySelector(".mod__detail p").textContent = detailText(mod, status);
+      li.querySelector(".mod__detail code").textContent = mod.build;
+      const btn = li.querySelector(".mod__row");
+      btn.addEventListener("click", () => {
+        const open = btn.getAttribute("aria-expanded") !== "true";
+        btn.setAttribute("aria-expanded", String(open));
+        li.querySelector(".mod__detail").hidden = !open;
+      });
+      list.append(li);
+    }
   }
-
-  function close({ restoreFocus = false } = {}) {
-    if (restoreFocus && openId) list.querySelector(`[data-id="${openId}"] button`)?.focus();
-    pop.hidden = true;
-    list.querySelectorAll(".node__btn").forEach((b) => b.setAttribute("aria-expanded", "false"));
-    openId = null;
-  }
-
-  document.addEventListener("click", (e) => {
-    if (openId && !pop.contains(e.target)) close();
-  });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && openId) close({ restoreFocus: true });
-  });
-
-  renderMobileList();
+  render();
 
   return {
-    close,
     /** statusList: array in MODULES order, e.g. ["online", "stub", "offline", ...] */
     setStatuses(statusList) {
       MODULES.forEach((m, i) => {
         statuses[m.id] = statusList[i];
-        list.querySelector(`[data-id="${m.id}"]`).dataset.status = statusList[i];
-        staticSvg.querySelector(`.s-leader[data-id="${m.id}"]`).dataset.status = statusList[i];
       });
-      renderMobileList();
-      if (openId) open(openId);
-    },
-    set(id, status) {
-      statuses[id] = status;
-      list.querySelector(`[data-id="${id}"]`).dataset.status = status;
-      staticSvg.querySelector(`.s-leader[data-id="${id}"]`).dataset.status = status;
-      renderMobileList();
+      render();
     },
     get onlineCount() {
       return Object.values(statuses).filter((s) => s === "online").length;

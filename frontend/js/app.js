@@ -3,9 +3,10 @@
 //   api.js        every backend call (health, models, openapi, chat stream)
 //   sse.js        reads the Server-Sent Events stream from /api/chat
 //   markdown.js   safe rendering of model replies
-//   core.js       the rotating core that reacts to the stream
-//   modules.js    the module ring (lights up as you build each phase)
-//   telemetry.js  left rail, chips, clock, traffic — real numbers only
+//   core.js       the rotating rings around the Earth, reacting to the stream
+//   globe.js      the holographic Earth that "talks" while Atlas replies
+//   modules.js    the module list (lights up as you build each phase)
+//   telemetry.js  Systems drawer panels, link chip, clock — real numbers only
 //   chat.js       session log + composer
 //   boot.js       the start-up sequence (once per session)
 //
@@ -15,7 +16,7 @@ import { checkHealth, fetchModels, fetchOpenApi, probe } from "./api.js";
 import { hasBooted, runBoot } from "./boot.js";
 import { createChat } from "./chat.js";
 import { createCore } from "./core.js";
-import { createModuleRing, detectStatuses, MODULES } from "./modules.js";
+import { createModuleList, detectStatuses, MODULES } from "./modules.js";
 import { createTelemetry } from "./telemetry.js";
 
 // Who's at the controls. Change it here (or store your own: see setOperator).
@@ -46,7 +47,7 @@ $("operator-name").textContent = operatorName();
 // --- Build the pieces --------------------------------------------------------
 const core = createCore();
 const telemetry = createTelemetry();
-const ring = createModuleRing();
+const modules = createModuleList();
 let linkOk = null;
 
 // The model picker. Remembers your last choice.
@@ -68,55 +69,10 @@ select.addEventListener("change", () => {
   telemetry.setModel(select.value, modelListStatus);
 });
 
-// Light pulses along the beams between the core and the session log:
-// "out" = your message travels from the log into the core,
-// "in"  = the reply flows from the core to the log (at most every 700 ms).
-const beams = [...document.querySelectorAll(".beam__pulse")];
-const coreEl = $("core");
-const comms = document.querySelector(".comms");
-let lastBeam = 0;
-function beamPulse(direction) {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  if (!beams[0].offsetParent) return; // beams hidden (phone layout)
-  const now = performance.now();
-  if (direction === "in" && now - lastBeam < 700) return;
-  lastBeam = now;
-
-  const beamWidth = beams[0].parentElement.clientWidth;
-  // The core is centred in the stage; its outer ring is ~44% of its width out.
-  const coreEdge = $("stage").clientWidth / 2 + coreEl.offsetWidth * 0.44;
-  // The pulse is 140px wide and centred on its x, so stop 70px short of the
-  // log's frame: it must land on the frame, not run into the transcript.
-  const logEdge = beamWidth - 70;
-  const [from, to] = direction === "out" ? [logEdge, coreEdge] : [coreEdge, logEdge];
-  const duration = 620;
-  for (const [i, pulse] of beams.entries()) {
-    pulse.animate(
-      [
-        { transform: `translateX(${from}px)`, opacity: 0 },
-        { opacity: 1, offset: 0.25 },
-        { opacity: 1, offset: 0.8 },
-        { transform: `translateX(${to}px)`, opacity: 0 },
-      ],
-      { duration, delay: i * 70, easing: "cubic-bezier(0.77, 0, 0.175, 1)" },
-    );
-  }
-  // When a reply pulse lands, the log's frame catches the light.
-  if (direction === "in") {
-    setTimeout(() => {
-      comms.classList.add("is-receiving");
-      setTimeout(() => comms.classList.remove("is-receiving"), 160);
-    }, duration * 0.85);
-  } else {
-    setTimeout(() => core.pulse(), duration * 0.85);
-  }
-}
-
 const chat = createChat({
   core,
   telemetry,
   getModel: () => select.value,
-  onStreamActivity: beamPulse,
 });
 
 // --- Checks (used by the boot sequence and on every normal load) -------------
@@ -155,8 +111,8 @@ async function loadModules() {
   const spec = await fetchOpenApi();
   telemetry.setVersion(spec?.version);
   const statuses = await detectStatuses(spec, probeOnce);
-  ring.setStatuses(statuses);
-  telemetry.setModules(ring.onlineCount, MODULES.length);
+  modules.setStatuses(statuses);
+  telemetry.setModules(modules.onlineCount, MODULES.length);
   return { spec, statuses };
 }
 
@@ -181,7 +137,7 @@ const BOOT_STEPS = [
     run: async () => {
       const { spec } = await loadModules();
       if (!spec) return { text: "Unavailable", tone: "warn" };
-      return { text: `${ring.onlineCount} / ${MODULES.length} online` };
+      return { text: `${modules.onlineCount} / ${MODULES.length} online` };
     },
   },
   {
@@ -196,6 +152,7 @@ function settleCore() {
   else core.setState("standby", "Awaiting command");
 }
 async function boot() {
+  if (document.body.classList.contains("drawer-open")) toggleDrawer(false);
   await runBoot(BOOT_STEPS, { core });
   settleCore();
 }
@@ -217,7 +174,7 @@ document.addEventListener("keydown", (e) => {
     e.preventDefault();
     boot();
   }
-  if (e.key === "Escape" && document.body.classList.contains("systems-open")) toggleSystems(false);
+  if (e.key === "Escape" && document.body.classList.contains("drawer-open")) toggleDrawer(false);
   // "/" jumps to the composer from anywhere that isn't a text field.
   if (e.key === "/" && !e.target.closest("input, textarea, select, [contenteditable]")) {
     e.preventDefault();
@@ -226,14 +183,38 @@ document.addEventListener("keydown", (e) => {
 });
 $("reboot").addEventListener("click", boot);
 
-// Narrow screens: the "Systems" button opens the telemetry + modules sheet.
-const systemsBtn = $("systems-toggle");
-function toggleSystems(force) {
-  const open = document.body.classList.toggle("systems-open", force);
-  systemsBtn.setAttribute("aria-expanded", String(open));
-  systemsBtn.textContent = open ? "Close" : "Systems";
+// --- Systems drawer (telemetry + modules) -------------------------------------
+const drawer = $("drawer");
+const scrim = $("scrim");
+const menuBtn = $("menu-btn");
+function toggleDrawer(force) {
+  const open = document.body.classList.toggle("drawer-open", force);
+  menuBtn.setAttribute("aria-expanded", String(open));
+  drawer.setAttribute("aria-hidden", String(!open));
+  drawer.inert = !open; // closed drawer: not focusable, not read out
+  if (open) {
+    scrim.hidden = false;
+    $("drawer-close").focus();
+  } else {
+    setTimeout(() => !document.body.classList.contains("drawer-open") && (scrim.hidden = true), 250);
+    menuBtn.focus();
+  }
 }
-systemsBtn.addEventListener("click", () => toggleSystems());
+menuBtn.addEventListener("click", () => toggleDrawer());
+$("drawer-close").addEventListener("click", () => toggleDrawer(false));
+scrim.addEventListener("click", () => toggleDrawer(false));
+
+// Tabs inside the drawer: Telemetry | Modules.
+const tabs = [...document.querySelectorAll(".tab")];
+for (const tab of tabs) {
+  tab.addEventListener("click", () => {
+    for (const t of tabs) {
+      const selected = t === tab;
+      t.setAttribute("aria-selected", String(selected));
+      $(t.getAttribute("aria-controls")).hidden = !selected;
+    }
+  });
+}
 
 // A small console API for tinkering.
 window.atlas = { setOperator, reboot: boot };

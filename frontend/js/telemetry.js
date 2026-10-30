@@ -1,4 +1,4 @@
-// telemetry.js — the left rail, the top-bar chips, the clock and the strip.
+// telemetry.js — the Systems drawer panels, the link chip and the clock.
 //
 // Rule for every number on screen: it is measured, or it says it's waiting.
 // Nothing here is simulated.
@@ -114,7 +114,7 @@ export function createTelemetry() {
     },
 
     setModules(online, total) {
-      setChip("chip-modules", online > 0 ? "ok" : "warn", `${online} / ${total}`);
+      $("modules-count").textContent = `${online} / ${total}`;
     },
 
     /** Stats for the reply that just finished (all measured in the browser). */
