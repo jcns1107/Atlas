@@ -12,7 +12,7 @@ Plain HTML/CSS/JS in `frontend/` (no build step, no framework), served by the Fa
 
 ## Users
 
-One primary user: the owner, running Atlas on his own Windows machine against a local Ollama server. He is building the backend himself, phase by phase (GUIDE.md), to learn local AI; he wants nothing to do with frontend work. He uses the UI daily to chat with local models and to see which parts of Atlas he has already built.
+One primary user: the owner, running Atlas on his own Windows machine against a local Ollama server. He is building the backend himself, phase by phase (GUIDE.md), to learn local AI; he wants nothing to do with frontend work. He uses the UI daily to chat with local models, and wants it to feel like a finished product, not a build checklist.
 
 ## Product Purpose
 
@@ -20,19 +20,20 @@ Atlas is a self-hosted "Swiss-army knife" of local AI: agents and characters wit
 
 ## Positioning
 
-A personal AI workspace that the owner builds himself, layer by layer. The UI doubles as a live map of that build: modules come online as their backend routes appear.
+A personal AI workspace, presented as a product: your chats on the left, the conversation in the middle (the familiar Claude-style column), and Atlas itself on the right — a living, interactive holographic Earth that shows what the model is doing. What is still to be built lives in the roadmap, never on screen.
 
 ## Operating Context
 
-- Desktop browser on the owner's PC, `http://127.0.0.1:8000`, long sessions, usually in a dim room.
-- Backend contract today: `GET /api/health`; `POST /api/chat` streams Server-Sent Events, one JSON frame per event (`{"kind": "text" | "error" | "done", ...}`); `GET /api/models` is still a 501 stub.
-- Later phases add thinking, tool calls and token counts to the same stream, plus routers for models, tools, agents, memory, MCP, email, research, skills and characters.
+- Desktop browser on the owner's PC, `http://127.0.0.1:8000`, long sessions, usually in a dim room. Works down to a phone.
+- Backend contract today: `GET /api/health`; `GET /api/models`; `/api/conversations` (create, list, get, rename via PATCH, delete); `POST /api/chat` streams Server-Sent Events, one JSON frame per event (`{"kind": "text" | "thinking" | "error" | "done", ...}`, token counts on `done`).
+- The UI reads `/openapi.json` to learn what the backend can do (for example whether `POST /api/chat` accepts `conversation_id` yet) instead of guessing.
+- Later phases add tool calls to the same stream, and a voice route (Phase 15).
 
 ## Capabilities and Constraints
 
-- Real data only. Panels with no backend source yet (CPU, RAM, GPU) say they are waiting for their route instead of showing invented numbers.
+- Real data only. A value is measured, labelled as an estimate, or a dash.
+- Chats are saved through `/api/conversations`. Their messages are stored once `POST /api/chat` accepts `conversation_id` (GUIDE Phase 2, step 8); until then the UI keeps them in memory for the tab and says so in one quiet line.
 - `core/` must not import FastAPI; the frontend is the one area Claude builds and maintains.
-- No conversation persistence until Phase 2.
 
 ## Brand Commitments
 
@@ -45,10 +46,11 @@ No screenshots, logos or brand assets exist. The roadmap (`docs/ROADMAP.md`) and
 
 ## Product Principles
 
-1. The screen tells the truth about the backend: online, stub, or not built.
+1. The screen tells the truth about the backend: nothing pretends to be saved, measured or working when it isn't.
 2. Chat is the job; the spectacle never gets in the way of reading a reply.
-3. Every module points at where it gets built, so the UI teaches the roadmap.
-4. Local-first: works with no internet.
+3. A product, not a progress report: features that aren't built don't appear on screen. The roadmap tracks them.
+4. Atlas is present: the Earth reacts to every state and to the operator (typing, hovering, dragging), and can take the whole screen (presence view, later voice mode).
+5. Local-first: works with no internet.
 
 ## Accessibility & Inclusion
 

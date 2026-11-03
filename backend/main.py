@@ -17,14 +17,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from backend.api.routes import chat, models
+from backend.api.routes import chat, models, conversations
 from backend.config import DATA_DIR, FRONTEND_DIR
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: make sure the local data directories exist.
-    for sub in ("agents", "characters", "memory", "skills"):
+    for sub in ("agents", "characters", "memory", "skills", "conversations"):
         (DATA_DIR / sub).mkdir(parents=True, exist_ok=True)
     yield
     # Shutdown: nothing to clean up yet.
@@ -43,6 +43,7 @@ app.add_middleware(
 # ---- API routes (each feature gets its own router under /api) ----
 app.include_router(chat.router, prefix="/api")
 app.include_router(models.router, prefix="/api")
+app.include_router(conversations.router, prefix="/api")
 
 
 @app.get("/api/health")

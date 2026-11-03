@@ -31,3 +31,7 @@ class ChatRequest(BaseModel):
 
     # A boolean flag indicating whether to stream the response, which defaults to True.
     stream: bool = Field(default=True, description="Whether to stream the response")
+
+    think: bool | None = Field(
+        default=None, description="Whether to enable thinking mode (if supported by the model)"
+    )

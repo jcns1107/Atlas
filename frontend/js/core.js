@@ -1,10 +1,13 @@
-// core.js — the HUD's centre: a holographic Earth inside rotating rings,
-// all reacting to the model. (The Earth itself is drawn by globe.js.)
+// core.js — Atlas's presence: the living Earth (globe.js) inside rotating
+// rings, all reacting to the model and to you.
 //
-// The signature idea: the core is driven by REAL stream data.
-//   - waiting for the first token → a bright scan arc sweeps the inner ring
+//   - waiting for the first token → a bright scan arc sweeps the inner ring and
+//     signal arcs fire across the Earth
 //   - streaming → every chunk makes the Earth "talk" (ripples + voice bars),
 //     and the rings spin faster the more chunks per second the model produces
+//   - typing → each keystroke flickers the Earth (it's listening)
+//   - the pointer → the whole instrument leans toward it a few degrees, on a
+//     spring, so it feels physical rather than glued to the mouse
 //   - backend unreachable → the rings stop and the core greys out
 //
 // Each ring is a separate <svg> element rotated with the Web Animations API.
@@ -15,6 +18,7 @@ import { createGlobe } from "./globe.js";
 
 const SVG = "http://www.w3.org/2000/svg";
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
 
 // How fast each ring turns at "speed 1" (one full turn every N ms) and which way.
 // `coupled` rings change speed with the state and the stream rate. The scan arc
@@ -34,10 +38,12 @@ const LABELS = {
   standby: "Standby",
   listening: "Listening",
   thinking: "Thinking",
-  streaming: "Streaming",
+  streaming: "Speaking",
   error: "Fault",
   offline: "Offline",
 };
+
+const MAX_LEAN = 7; // degrees the instrument leans toward the pointer
 
 function line(parent, r1, r2, angleDeg, className) {
   const a = (angleDeg * Math.PI) / 180;
@@ -50,15 +56,20 @@ function line(parent, r1, r2, angleDeg, className) {
   parent.append(el);
 }
 
-export function createCore() {
+/**
+ * leanArea: the element whose pointer movement makes the core lean toward it
+ * (the presence panel). Optional.
+ */
+export function createCore({ leanArea } = {}) {
   const root = document.getElementById("core");
+  const layers = document.getElementById("core-layers");
   const stateEl = document.getElementById("core-state");
   const detailEl = document.getElementById("core-detail");
-  const globe = createGlobe(document.getElementById("globe"));
+  const globe = createGlobe(document.getElementById("globe"), root);
   const bloom = document.getElementById("core-bloom");
   const ctxArc = document.getElementById("core-ctx");
 
-  // Draw the tick ring (120 ticks, every 10th one long) and the iris blades.
+  // Draw the tick ring: 120 ticks, every 10th one long.
   const ticks = document.getElementById("ring-ticks");
   for (let i = 0; i < 120; i++) {
     const major = i % 10 === 0;
@@ -92,6 +103,9 @@ export function createCore() {
   let energy = 0; // 0..1, pumped by each chunk, decays every frame
   let frame = 0;
 
+  // The lean: target angles from the pointer, current angles on a spring.
+  const lean = { x: 0, y: 0, tx: 0, ty: 0, vx: 0, vy: 0 };
+
   function applyMotionPreference() {
     // Reduced motion: no rotation at all. State still shows through colour.
     for (const a of anims) reduceMotion.matches ? a.pause() : a.play();
@@ -100,7 +114,8 @@ export function createCore() {
   reduceMotion.addEventListener("change", applyMotionPreference);
 
   // One small animation loop that runs only while something is changing:
-  // ease the ring speed toward its target and let the bloom's energy decay.
+  // ease the ring speed toward its target, let the bloom's energy decay, and
+  // move the lean along its spring.
   function tick() {
     speed += (target - speed) * 0.06;
     energy *= 0.9;
@@ -111,7 +126,20 @@ export function createCore() {
     // Brightness carries the pulse even with reduced motion (no movement).
     bloom.style.opacity = String(0.25 + energy * 0.6);
 
-    const settled = Math.abs(target - speed) < 0.01 && energy < 0.01;
+    // Spring toward the pointer: stiffness 120, damping ratio ~0.7 (a soft,
+    // physical follow, not a 1:1 glue to the mouse).
+    const dt = 1 / 60;
+    for (const axis of ["x", "y"]) {
+      const v = `v${axis}`;
+      const tgt = lean[`t${axis}`];
+      lean[v] += ((tgt - lean[axis]) * 120 - lean[v] * 15) * dt;
+      lean[axis] += lean[v] * dt;
+    }
+    layers.style.transform = `rotateX(${lean.y.toFixed(2)}deg) rotateY(${lean.x.toFixed(2)}deg)`;
+
+    const leanSettled =
+      Math.abs(lean.tx - lean.x) < 0.02 && Math.abs(lean.ty - lean.y) < 0.02 && Math.abs(lean.vx) + Math.abs(lean.vy) < 0.02;
+    const settled = Math.abs(target - speed) < 0.01 && energy < 0.01 && leanSettled;
     if (settled) {
       speed = target;
       frame = 0;
@@ -123,15 +151,37 @@ export function createCore() {
     if (!frame) frame = requestAnimationFrame(tick);
   };
 
+  if (leanArea) {
+    leanArea.addEventListener("pointermove", (e) => {
+      if (!finePointer.matches || reduceMotion.matches || root.classList.contains("is-dragging")) return;
+      const rect = root.getBoundingClientRect();
+      if (!rect.width) return;
+      // -1..1 from the core's centre, measured in core widths, then clamped.
+      const nx = Math.max(-1, Math.min(1, (e.clientX - (rect.left + rect.width / 2)) / rect.width));
+      const ny = Math.max(-1, Math.min(1, (e.clientY - (rect.top + rect.height / 2)) / rect.height));
+      lean.tx = nx * MAX_LEAN;
+      lean.ty = -ny * MAX_LEAN;
+      kick();
+    });
+    leanArea.addEventListener("pointerleave", () => {
+      lean.tx = 0;
+      lean.ty = 0;
+      kick();
+    });
+  }
+
   return {
+    el: root,
+
     get state() {
       return state;
     },
 
-    /** Switch state: standby | listening | thinking | streaming | error | offline */
+    /** Switch state: standby | listening | thinking | streaming | error | offline | booting */
     setState(next, detail) {
       state = next;
       root.dataset.state = next;
+      document.documentElement.dataset.atlas = next; // lets CSS elsewhere (mini orb, captions) follow
       stateEl.textContent = LABELS[next] ?? next;
       if (detail !== undefined) detailEl.textContent = detail;
       target = SPEED[next] ?? 1;
@@ -155,6 +205,13 @@ export function createCore() {
       kick();
     },
 
+    /** A keystroke in the composer. */
+    nudge() {
+      energy = Math.min(1, energy + 0.05);
+      globe.nudge();
+      kick();
+    },
+
     /** While streaming: spin faster with the model's real output rate. */
     setRate(chunksPerSecond) {
       if (state !== "streaming") return;
@@ -163,7 +220,7 @@ export function createCore() {
       kick();
     },
 
-    /** Fill the inner arc: how much of the context window is (roughly) used. */
+    /** Fill the context arc: how much of the context window is used. */
     setContext(fraction) {
       const pct = Math.max(0, Math.min(1, fraction)) * 100;
       ctxArc.style.strokeDasharray = `${pct.toFixed(2)} 100`;

@@ -1,13 +1,14 @@
 // boot.js — the start-up sequence (once per browser session).
 //
-// The real core flies to the middle of the screen, its rings and the Earth
-// open from the centre outward while the boot log runs real checks (backend
-// link, model list, modules), then it glides back to its place and the chat
-// draws in under it. Click or press any key to skip; Alt+Shift+B replays it.
+// The real core lifts out of its place to the middle of the screen, its rings
+// and the Earth open from the centre outward while the boot log runs real
+// checks (backend link, model list, chats), then it glides back home and the
+// app draws in around it. Click or press any key to skip; Alt+Shift+B replays.
 //
-// The "fly to the middle and back" trick is called FLIP: measure where the
-// element really is, move it somewhere else with a transform, then animate the
-// transform back to nothing. Only `transform` moves, so it stays smooth.
+// The core is lifted into <body> at its full boot size (so the Earth's canvas
+// stays sharp) and the glide home is one transform: move to where the slot is
+// and scale down to the slot's size. Only `transform` animates, so it's smooth.
+// Its home may be the presence panel or the small orb in the chat header.
 
 const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -27,7 +28,7 @@ let running = false;
 /**
  * steps: [{ label, run: async () => ({ text, tone: "ok" | "warn" }) }]
  * core:  the controller from core.js (its readout says "Atlas · Initialising")
- * Resolves when the core is home and the panels have drawn in.
+ * Resolves when the core is home and the app has drawn in.
  */
 export async function runBoot(steps, { core } = {}) {
   if (running) return;
@@ -36,26 +37,31 @@ export async function runBoot(steps, { core } = {}) {
   const html = document.documentElement;
   const boot = document.getElementById("boot");
   const logEl = document.getElementById("boot-log");
-  const hud = document.getElementById("hud");
+  const app = document.getElementById("app");
   const coreEl = document.getElementById("core");
+  const slot = coreEl.parentElement;
   const rm = reduceMotion();
 
-  document.body.classList.remove("drawer-open");
   logEl.innerHTML = "";
   boot.classList.remove("is-leaving");
   html.classList.remove("will-boot");
   html.classList.add("booting");
   core?.setState("booting", "Initialising");
 
-  // FLIP, step 1: where does the core live? Step 2: move it to the centre.
-  coreEl.style.transform = "";
-  const home = coreEl.getBoundingClientRect();
-  const size = Math.min(innerWidth, innerHeight * 0.75) * 0.6;
-  const scale = size / home.width;
-  const dx = innerWidth / 2 - (home.left + home.width / 2);
-  const dy = innerHeight * 0.4 - (home.top + home.height / 2);
-  const centred = `translate(${dx}px, ${dy}px) scale(${scale})`;
-  coreEl.style.transform = centred;
+  // Lift the core: fixed, centred at 40% of the height, at its boot size.
+  const size = Math.round(Math.min(innerWidth, innerHeight * 0.75) * 0.6);
+  const cx = innerWidth / 2;
+  const cy = innerHeight * 0.4;
+  Object.assign(coreEl.style, {
+    position: "fixed",
+    left: `${cx - size / 2}px`,
+    top: `${cy - size / 2}px`,
+    width: `${size}px`,
+    height: `${size}px`,
+    zIndex: "60",
+  });
+  coreEl.classList.add("is-lifted");
+  document.body.append(coreEl);
 
   // The rings open from the centre outward, one after another.
   if (!rm) {
@@ -106,27 +112,39 @@ export async function runBoot(steps, { core } = {}) {
     /* fine */
   }
 
-  // Hand-off: the overlay fades, the core glides home (FLIP step 3), and the
-  // panels draw in around it, staggered.
+  // Hand-off: the overlay fades, the app draws in, and the core glides home.
   boot.classList.add("is-leaving");
-  coreEl.style.zIndex = "60"; // stay above the fading overlay while moving
-  coreEl.style.transform = "";
-  if (!rm) {
-    coreEl.animate([{ transform: centred }, { transform: "none" }], {
-      duration: 850,
-      easing: EASE_IN_OUT,
-    });
-  }
-  hud.querySelectorAll(".readout, [data-reveal]").forEach((el, i) =>
-    el.style.setProperty("--i", i + 3),
-  );
-  hud.classList.add("is-revealing");
+  app.querySelectorAll("[data-reveal]").forEach((el, i) => el.style.setProperty("--i", i + 2));
+  app.classList.add("is-revealing");
   html.classList.remove("booting");
   window.removeEventListener("keydown", skip);
 
-  await wait(rm ? 300 : 1500);
+  const home = slot.getBoundingClientRect();
+  const goHome = () => {
+    slot.append(coreEl);
+    coreEl.removeAttribute("style");
+    coreEl.classList.remove("is-lifted");
+  };
+  if (rm || !home.width) {
+    // Reduced motion, or no visible home: a short fade instead of the glide.
+    await coreEl.animate([{ opacity: 1 }, { opacity: 0 }], { duration: rm ? 200 : 400, fill: "forwards" }).finished;
+    goHome();
+    coreEl.getAnimations().forEach((a) => a.cancel());
+  } else {
+    const dx = home.left + home.width / 2 - cx;
+    const dy = home.top + home.height / 2 - cy;
+    const scale = Math.min(home.width, home.height) / size;
+    const glide = coreEl.animate(
+      [{ transform: "none" }, { transform: `translate(${dx}px, ${dy}px) scale(${scale})` }],
+      { duration: 850, easing: EASE_IN_OUT, fill: "forwards" },
+    );
+    await glide.finished;
+    goHome();
+    glide.cancel();
+  }
+
+  await wait(rm ? 100 : 500);
   boot.classList.remove("is-leaving");
-  coreEl.style.zIndex = "";
-  hud.classList.remove("is-revealing");
+  app.classList.remove("is-revealing");
   running = false;
 }

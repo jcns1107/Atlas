@@ -18,7 +18,6 @@ incrementally — each frame looks like  `data: <text>\n\n`.
 Keep this route THIN: parse the request, call core, stream the result. All the
 real model logic belongs in core/llm/, not here.
 
-Right now it returns 501 so the app still boots and the route shows up in /docs.
 """
 
 from __future__ import annotations
@@ -28,13 +27,10 @@ import json
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 
-from backend.core.llm.base import ChatProvider
-from backend.core.llm.ollama_provider import OllamaProvider
+from backend.api.deps import provider
 from backend.schemas.chat import ChatRequest
 
 router = APIRouter(tags=["chat"])
-
-provider: ChatProvider = OllamaProvider()
 
 
 @router.post("/chat")
@@ -46,12 +42,21 @@ async def chat(req: ChatRequest) -> StreamingResponse:
         # framing: model chunks often contain "\n" (new paragraphs), and SSE
         # treats a blank line as "end of event" — so the newlines got lost.
         # json.dumps escapes them, and the `kind` field gets the frontend ready
-        # for Phase 4 (thinking / tool_call events ride the same stream).
+        # now the provider labels the chunks with "text", "thinking", and "done"
+        # so the UI can show them differently.
+        saw_done = False
         try:
-            async for chunk in provider.stream_chat(req.messages, req.model):
-                yield f"data: {json.dumps({'kind': 'text', 'text': chunk})}\n\n"
+            async for chunk in provider.stream_chat(req.messages, req.model, req.think):
+                if chunk.kind == "done":
+                    # The provider finished the reply; send the final chunk
+                    # and records done so the browser knows the stream ended.
+                    saw_done = True
+                yield f"data: {chunk.model_dump_json(exclude_none=True)}\n\n"
         except Exception as exc:  # `exc`, not `exec` — that name is a Python builtin
             yield f"data: {json.dumps({'kind': 'error', 'message': str(exc)})}\n\n"
-        yield f"data: {json.dumps({'kind': 'done'})}\n\n"
+        if not saw_done:
+            # If the provider didn't yield a "done" chunk,
+            # send one now so the browser always knows the stream ended.
+            yield f"data: {json.dumps({'kind': 'done'})}\n\n"
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")

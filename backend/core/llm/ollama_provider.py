@@ -1,44 +1,32 @@
-"""Ollama provider — YOUR job to implement (GUIDE.md, Phase 1).
+"""Ollama provider: talks to a local Ollama server (default http://localhost:11434).
 
-Talk to a locally running Ollama server (default http://localhost:11434) and
-implement the interface you defined in base.py.
+Implements the ChatProvider interface from base.py, so routes never need to know
+they're talking to Ollama.
 
-Ollama's REST API (the two endpoints you need first):
-  - POST /api/chat  : a chat completion. With {"stream": true} the response is
-                      newline-delimited JSON — each line is a chunk that holds
-                      message.content (the next piece of text) and a `done` flag.
-  - GET  /api/tags  : the models the user has pulled.
+Endpoints used:
+  - GET  /api/tags : the models the user has pulled -> list_models().
+  - POST /api/chat : a chat completion. With {"stream": true} the reply is
+                     newline-delimited JSON — one JSON object per line.
+                     stream_chat() turns each line into StreamChunks:
+                       message.thinking -> "thinking" chunk
+                       message.content  -> "text" chunk
+                       done: true       -> one "done" chunk with token counts
+                                           (prompt_eval_count / eval_count)
 
-What to implement:
-  - list_models()                  -> the installed model names.
-  - stream_chat(messages, model)   -> yield each text chunk as it arrives.
+Things worth knowing:
+  - `num_ctx` is sent on every call. Ollama's default context window is small
+    and anything past it is cut off WITHOUT an error — a classic "why did it
+    forget the start of the chat?" bug.
+  - `think` is only sent when set. Thinking models (qwen3, gpt-oss, ...) think
+    by default; sending `"think": true` to a model that can't think is an error.
+  - Errors arrive two ways: as an HTTP error before streaming starts (e.g. model
+    not found) or as an {"error": ...} line mid-stream. Both raise RuntimeError;
+    the route turns that into an "error" frame for the browser.
 
-Hints:
-  - Use `httpx2.AsyncClient` (httpx2 is the maintained fork of httpx — same API,
-    so httpx tutorials still apply). For streaming, `client.stream("POST", url, json=...)`
-    plus `async for line in resp.aiter_lines()`.
-  - Each streamed line is JSON — parse it, pull out the text, `yield` it.
-  - Read OLLAMA_BASE_URL / OLLAMA_DEFAULT_MODEL / OLLAMA_NUM_CTX from
-    `backend.config.settings`.
-  - Always send `"options": {"num_ctx": settings.ollama_num_ctx}`. Ollama's
-    default window is small and anything past it is cut off WITHOUT an error —
-    a classic "why did it forget the start of the chat?" bug.
-  - Before coding, poke the API by hand to see the response shape, e.g.:
-      curl http://localhost:11434/api/chat \
-        -d '{"model":"qwen3:4b","messages":[{"role":"user","content":"hi"}]}'
-
-Fields you'll meet in later phases (same endpoint, more of the chunk):
-  - message.thinking   : "thinking" models (qwen3, gpt-oss, ...) stream their
-                         reasoning here, separate from message.content. The
-                         request flag `"think": true/false` turns it on/off.
-                         (Phase 2: show it in a collapsible block.)
+Fields for later phases (same endpoint):
   - message.tool_calls : the model asking to run a tool (Phase 4).
-  - "format": {...}    : pass a JSON schema in the request and the reply is
-                         forced to match it — "structured outputs" (great for
-                         the email triage in Phase 8 and research plans in 9).
-  - prompt_eval_count / eval_count (on the final `done` chunk): how many tokens
-                         the prompt and the answer used. That's real data for
-                         your context budget in core/context/.
+  - "format": {...}    : a JSON schema in the request forces the reply to match
+                         it — "structured outputs" (Phase 8 triage, Phase 9 plans).
 """
 
 from __future__ import annotations
@@ -51,7 +39,7 @@ from collections.abc import AsyncIterator
 import httpx2
 
 from backend.config import settings
-from backend.core.llm.base import Message
+from backend.core.llm.base import Message, StreamChunk
 
 
 class OllamaProvider:
@@ -76,8 +64,8 @@ class OllamaProvider:
             return [m["name"] for m in data["models"]]
 
     async def stream_chat(
-        self, messages: list[Message], model: str | None = None
-    ) -> AsyncIterator[str]:
+        self, messages: list[Message], model: str | None = None, think: bool | None = None
+    ) -> AsyncIterator[StreamChunk]:
         """Send the conversation to the model and yields the text as it arrives"""
         model = model or self.default_model
         url = f"{self.base_url}/api/chat"
@@ -87,6 +75,8 @@ class OllamaProvider:
             "stream": True,
             "options": {"num_ctx": self.num_ctx},
         }
+        if think is not None:
+            payload["think"] = think
 
         async with httpx2.AsyncClient(timeout=httpx2.Timeout(10.0, read=300.0)) as client:
             async with client.stream("POST", url, json=payload) as response:
@@ -105,10 +95,18 @@ class OllamaProvider:
                     if "error" in data:
                         raise RuntimeError(f"Ollama error: {data['error']}")
 
-                    if data.get("done"):
-                        break
-
                     message = data.get("message", {})
+                    thinking = message.get("thinking", "")
+                    if thinking:
+                        yield StreamChunk(kind="thinking", text=thinking)
                     content = message.get("content", "")
                     if content:
-                        yield content
+                        yield StreamChunk(kind="text", text=content)
+
+                    if data.get("done"):
+                        yield StreamChunk(
+                            kind="done",
+                            prompt_tokens=data.get("prompt_eval_count"),
+                            output_tokens=data.get("eval_count"),
+                        )
+                        break

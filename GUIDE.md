@@ -158,6 +158,14 @@ how thinking models separate reasoning (`message.thinking`) from the answer.
 7. Show token usage after each reply (`prompt_eval_count` / `eval_count` on
    Ollama's final chunk) as "context used: N / num_ctx". You'll need this number
    a lot from Phase 5 on.
+8. **Save the messages.** The UI already sends `conversation_id` with every
+   `POST /api/chat` (pydantic ignores the field until `ChatRequest` has it). Add
+   it, then in the route: load the conversation, prepend its system prompt
+   (step 4), stream as usual, and when the stream ends save the request's
+   messages plus the reply. The route is `async` and the store does blocking
+   file I/O, so save with `await asyncio.to_thread(store.save, conv)`. Until
+   then the UI keeps messages in memory and says so under the composer; the
+   moment the field exists (it reads `/openapi.json`), that note disappears.
 
 ✅ **Done when:** you can have two separate chats, reload the page, and they're
 still there — and you can see how full the context window is.
@@ -472,9 +480,8 @@ top-p) change "personality"; a bit of UI/UX for the character builder.
 1. `Character` schema: name, personality, voice, backstory, avatar, sampling.
 2. A character = a persona layer over an agent. Reuse the agent runner.
 3. Character builder UI (avatar, traits, example dialogue).
-4. *(Stretch toward "talk with your agents")* add speech-to-text for input (a
-   local Whisper-family model) and text-to-speech for replies (a local engine
-   such as Piper or Kokoro).
+4. *(Stretch toward "talk with your agents")* give each character its own TTS
+   voice once voice mode exists — see [Phase 15](#phase-15--voice-mode-talk-to-atlas).
 
 ✅ **Done when:** you create a character with a distinct voice and it stays in
 character across a conversation.
@@ -503,6 +510,15 @@ servers speak — including Ollama itself, at `http://localhost:11434/v1`.
    server — compare it with your own compaction from Phase 5.)*
 5. Polish pass: error states, loading spinners, keyboard shortcuts, your own
    visual design in `frontend/css/styles.css`.
+6. **Provider-neutral errors** (left as TODOs in
+   [backend/api/routes/models.py](backend/api/routes/models.py)):
+   - `GET /api/models` catches `httpx2.ConnectError`, so the route knows the
+     Ollama provider's HTTP library. An API provider raises different errors.
+     Move the `try/except` into each provider (or have providers raise one
+     shared error type from `core/llm/`) so routes stay provider-agnostic.
+   - Only "Ollama not running" is handled. If Ollama answers with an error,
+     `raise_for_status()` raises `HTTPStatusError` and the page gets a 500.
+     Handle that case too (empty list + a visible warning in the UI).
 
 ✅ **Done when:** you flip a dropdown from `qwen3` to `claude` and the same
 chat — tools included — keeps working.
@@ -571,6 +587,45 @@ scratch code is simpler.
 
 > 💡 The lesson of Phases 13–14 isn't "frameworks win." It's that you can now make
 > that call *yourself*, because you built the thing they abstract away.
+
+---
+
+## Phase 15 — Voice mode: talk to Atlas
+
+🎯 **Goal:** speak to Atlas and hear it answer, hands-free, with the Earth as the
+only thing on screen — no text box.
+
+📚 **Learn:** **speech-to-text** (STT) with a local Whisper-family model
+(`faster-whisper`); **voice activity detection** (VAD, e.g. Silero) to know when
+you've stopped talking; **text-to-speech** (TTS) with a local engine (Piper or
+Kokoro); recording audio in the browser (`getUserMedia` + `MediaRecorder`, or an
+`AudioWorklet` for raw PCM); FastAPI **WebSockets** for two-way streaming;
+**latency budgets** — why Atlas should speak each sentence as soon as it's
+written instead of waiting for the whole reply.
+
+🔨 **Steps:**
+1. A `voice` extra in `pyproject.toml` (`uv sync --extra voice`) and settings in
+   `config.py`: STT model size, TTS voice, sample rate.
+2. `core/voice/stt.py`: `transcribe(audio) -> str` behind a small interface (the
+   same idea as `ChatProvider`), so you can swap engines later.
+3. `core/voice/tts.py`: `synthesize(text) -> audio` (WAV or raw PCM), same idea.
+4. `api/routes/voice.py`: start with plain HTTP — `POST /api/voice/transcribe`
+   and `POST /api/voice/speak` — so you can test each half in `/docs`.
+5. **Speak while streaming:** split the streamed reply into sentences and
+   synthesize each one as soon as it ends, so Atlas starts talking within about
+   a second.
+6. *(Stretch)* one `WebSocket /api/voice` session: mic audio in → VAD →
+   transcript → chat → audio out, with **barge-in** (Atlas stops talking when you
+   start).
+7. **Frontend (Claude):** voice mode — the presence view without the text box:
+   the Earth full screen, a mic button, live captions of what you said and what
+   Atlas says, and the Earth's voice bars driven by the real loudness of the
+   reply. The presence view (the expand button above the Earth) already exists
+   as the groundwork.
+
+✅ **Done when:** you open voice mode, ask a question out loud, and Atlas answers
+out loud — the Earth talking in time with its voice — without you touching the
+keyboard.
 
 ---
 

@@ -9,10 +9,14 @@
     <link rel="preload" href="/static/fonts/saira-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/static/css/styles.css" />
     <!-- The boot sequence runs once per browser session. This tiny inline check
-         hides the HUD before first paint so it never flashes in before the boot. -->
+         hides the app before first paint so it never flashes in before the boot.
+         It also restores the sidebar's open/closed state before first paint.
+         Add ?boot=0 to the address to skip the boot (handy for screenshots). -->
     <script>
       try {
+        if (/[?&]boot=0\b/.test(location.search)) sessionStorage.setItem("atlas.booted", "1");
         if (!sessionStorage.getItem("atlas.booted")) document.documentElement.classList.add("will-boot");
+        if (localStorage.getItem("atlas.sidebar") === "closed") document.documentElement.dataset.sidebar = "closed";
       } catch (e) {}
     </script>
   </head>
@@ -25,44 +29,151 @@
       <p class="boot__skip">Click or press any key to skip</p>
     </div>
 
-    <div class="hud" id="hud">
+    <!-- Three regions, left to right: your chats · the conversation · Atlas itself.
+         data-view="presence" turns the right-hand region into the whole screen
+         (the groundwork for voice mode, see GUIDE.md Phase 15). -->
+    <div class="app" id="app" data-view="chat">
       <!-- ============================================================
-           TOP BAR — the Systems drawer button, the name, link + clock
+           SIDEBAR — saved conversations (GET /api/conversations)
            ============================================================ -->
-      <header class="topbar" data-reveal>
-        <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="drawer">
-          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h9" /></svg>
-          <span>Systems</span>
+      <aside class="sidebar" id="sidebar" aria-label="Chats" data-reveal>
+        <div class="sidebar__head">
+          <a class="brand" href="#/" id="brand" aria-label="Atlas, new chat">
+            <svg class="brand__mark" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="6.5" />
+              <ellipse cx="12" cy="12" rx="2.8" ry="6.5" />
+              <path d="M5.5 12h13" />
+              <circle class="brand__orbit" cx="12" cy="12" r="10.25" />
+            </svg>
+            <span class="brand__name">Atlas</span>
+          </a>
+          <button class="icon-btn" id="sidebar-close" type="button" aria-label="Hide chats" title="Hide chats">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2.75" y="3.75" width="14.5" height="12.5" rx="1" /><path d="M7.75 4v12" /></svg>
+          </button>
+        </div>
+
+        <button class="new-chat" id="new-chat" type="button">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4.5v11M4.5 10h11" /></svg>
+          <span>New chat</span>
+          <kbd>Alt N</kbd>
         </button>
 
-        <div class="brand">
-          <span class="brand__name">Atlas</span>
-          <span class="brand__ver" id="version">OS</span>
-        </div>
+        <nav class="convos" id="convos" aria-label="Saved chats">
+          <!-- Filled by js/conversations.js -->
+        </nav>
 
-        <div class="topbar__right">
-          <span class="chip" id="chip-link" data-state="pending" title="Backend link (/api/health)">
-            <span class="chip__dot" aria-hidden="true"></span>
-            <span class="chip__label">Link</span>
-            <span class="chip__value" id="chip-link-value">checking</span>
+        <footer class="sidebar__foot">
+          <span class="operator">
+            <span class="operator__initial" id="operator-initial" aria-hidden="true">S</span>
+            <span class="operator__name" id="operator-name">Sigmar</span>
           </span>
-          <div class="clock" aria-live="off">
-            <time class="clock__time" id="clock-time">00:00:00</time>
-            <span class="clock__date" id="clock-date">&nbsp;</span>
+          <span class="link" id="link" data-state="pending" title="Backend round-trip (/api/health), every 5 s">
+            <span class="link__dot" aria-hidden="true"></span>
+            <span class="link__value" id="link-value">Connecting</span>
+          </span>
+        </footer>
+      </aside>
+
+      <!-- ============================================================
+           CONVERSATION — the transcript and the composer
+           ============================================================ -->
+      <main class="chat" id="chat" data-empty="true" data-reveal>
+        <header class="chat__head">
+          <button class="icon-btn chat__menu" id="sidebar-open" type="button" aria-label="Show chats" title="Show chats" aria-controls="sidebar">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2.75" y="3.75" width="14.5" height="12.5" rx="1" /><path d="M7.75 4v12" /></svg>
+          </button>
+          <h1 class="chat__title">
+            <button class="chat__rename" id="chat-title" type="button" title="Rename" disabled>New chat</button>
+          </h1>
+          <div class="chat__actions">
+            <button class="btn btn--quiet" id="instructions-btn" type="button" aria-expanded="false" aria-controls="instructions">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 5.5h12M4 10h12M4 14.5h7" /></svg>
+              <span>Instructions</span>
+              <span class="btn__dot" id="instructions-dot" hidden aria-label="(set)"></span>
+            </button>
+            <!-- On narrow screens the Earth moves here, small; tap it to open Atlas full screen. -->
+            <button class="mini-slot" id="mini-slot" type="button" aria-label="Open Atlas full screen" title="Open Atlas"></button>
+          </div>
+
+          <!-- Per-chat system prompt (Conversation.system_prompt) -->
+          <div class="pop" id="instructions" role="dialog" aria-labelledby="instructions-title" hidden>
+            <h2 class="pop__title" id="instructions-title">Instructions for this chat</h2>
+            <p class="pop__lede">Atlas reads these before every message in this chat.</p>
+            <label class="sr-only" for="instructions-input">Instructions</label>
+            <textarea class="pop__input" id="instructions-input" rows="6" placeholder="For example: Answer in Portuguese. Keep replies under 100 words."></textarea>
+            <p class="pop__note" id="instructions-note" hidden></p>
+            <div class="pop__bar">
+              <button class="btn btn--quiet" id="instructions-cancel" type="button">Cancel</button>
+              <button class="btn btn--primary" id="instructions-save" type="button">Save</button>
+            </div>
+          </div>
+        </header>
+
+        <div class="log" id="log" role="log" aria-live="polite" aria-relevant="additions">
+          <div class="log__inner" id="log-inner">
+            <section class="welcome" id="welcome" aria-labelledby="welcome-title">
+              <h2 class="welcome__title" id="welcome-title">Hello</h2>
+              <p class="welcome__lede" id="welcome-lede">Ask anything. Atlas answers with a model running on this machine.</p>
+            </section>
           </div>
         </div>
-      </header>
 
-      <main class="main">
-        <!-- ============================================================
-             THE CORE — a holographic Earth inside rotating rings
-             ============================================================ -->
-        <section class="stage" id="stage" aria-label="Atlas core">
-          <!-- Each ring is its own <svg> layer so the browser can rotate it on
-               the GPU. The Earth is a <canvas> drawn by js/globe.js. -->
-          <div class="core" id="core" data-state="standby">
+        <form class="composer" id="composer" autocomplete="off">
+          <label class="sr-only" for="input">Message Atlas</label>
+          <textarea class="composer__input" id="input" rows="1" placeholder="Message Atlas" spellcheck="true"></textarea>
+          <div class="composer__bar">
+            <label class="select" title="Model for this chat">
+              <span class="sr-only">Model</span>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.25" /><path d="M10 3.75v12.5M3.75 10h12.5" /></svg>
+              <select id="model"><option value="">Server default</option></select>
+            </label>
+            <label class="select" title="Default lets the model decide. Off answers faster. On fails on models that can't think.">
+              <span class="sr-only">Thinking</span>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 15.5h6M8 17.75h4M10 2.75a5 5 0 0 0-3 9c.6.45 1 1.1 1 1.85v.15h4v-.15c0-.75.4-1.4 1-1.85a5 5 0 0 0-3-9z" /></svg>
+              <select id="think">
+                <option value="">Thinking: default</option>
+                <option value="on">Thinking: on</option>
+                <option value="off">Thinking: off</option>
+              </select>
+            </label>
+            <span class="composer__hint">Enter to send · Shift+Enter for a new line</span>
+            <button class="send" id="send" type="submit" aria-label="Send" title="Send">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 15.5v-11M5.25 9.25 10 4.5l4.75 4.75" /></svg>
+            </button>
+            <button class="send send--stop" id="stop" type="button" aria-label="Stop the reply" title="Stop" hidden>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="6" y="6" width="8" height="8" rx="0.5" /></svg>
+            </button>
+          </div>
+        </form>
+        <p class="chat__note" id="chat-note" hidden></p>
+      </main>
+
+      <!-- ============================================================
+           PRESENCE — Atlas itself: the living Earth, its state and vitals
+           ============================================================ -->
+      <section class="presence" id="presence" aria-labelledby="core-state">
+        <header class="presence__head" data-reveal>
+          <p class="readout" aria-live="polite">
+            <span class="readout__state" id="core-state">Standby</span>
+            <span class="readout__detail" id="core-detail">Awaiting command</span>
+          </p>
+          <div class="clock" aria-live="off">
+            <time class="clock__time" id="clock-time">00:00</time>
+            <span class="clock__date" id="clock-date">&nbsp;</span>
+          </div>
+          <button class="icon-btn presence__toggle" id="presence-toggle" type="button" aria-pressed="false" aria-label="Open Atlas full screen" title="Full screen">
+            <svg class="i-open" viewBox="0 0 20 20" aria-hidden="true"><path d="M11.5 3.75h4.75V8.5M8.5 16.25H3.75V11.5M16 4 11 9M4 16l5-5" /></svg>
+            <svg class="i-close" viewBox="0 0 20 20" aria-hidden="true"><path d="M15.75 8.5H11.5V4.25M4.25 11.5H8.5v4.25M11.5 8.5 16.5 3.5M8.5 11.5l-5 5" /></svg>
+          </button>
+        </header>
+
+        <div class="presence__stage" id="stage">
+          <!-- The core: SVG rings (each its own layer, rotated on the GPU) around
+               the Earth, a <canvas> drawn by js/globe.js. Drag it to spin it. -->
+          <div class="core" id="core" data-state="standby" tabindex="0" role="img"
+               aria-label="Atlas. Drag or use the arrow keys to turn the globe.">
             <div class="core__bloom" id="core-bloom" aria-hidden="true"></div>
-            <div class="core__layers" aria-hidden="true">
+            <div class="core__layers" id="core-layers" aria-hidden="true">
               <svg class="layer layer--static" viewBox="-300 -300 600 600">
                 <circle class="s-faint" r="292" />
                 <g class="s-brackets">
@@ -85,136 +196,36 @@
               <canvas class="layer layer--globe" id="globe"></canvas>
             </div>
           </div>
+        </div>
 
-          <p class="readout" aria-live="polite">
-            <span class="readout__state" id="core-state">Standby</span>
-            <span class="readout__detail" id="core-detail">Awaiting command</span>
-          </p>
-        </section>
+        <!-- Presence view only: Atlas's latest reply, as captions under the Earth. -->
+        <p class="captions" id="captions" aria-hidden="true"></p>
 
-        <!-- ============================================================
-             CHAT — session log + composer
-             ============================================================ -->
-        <section class="comms" aria-labelledby="comms-title" data-reveal>
-          <header class="comms__head">
-            <h1 class="comms__title" id="comms-title">Session log</h1>
-            <span class="comms__count" id="comms-count">No messages</span>
-            <button class="btn btn--ghost" id="new-session" type="button">New session</button>
-          </header>
-
-          <div class="log" id="log" role="log" aria-live="polite" aria-relevant="additions">
-            <p class="empty" id="empty">Channel open. Ask Atlas anything.</p>
+        <dl class="vitals" data-reveal>
+          <div class="vital">
+            <dt>Model</dt>
+            <dd><span class="vital__value" id="v-model">Server default</span><span class="vital__sub" id="v-model-sub">This chat</span></dd>
           </div>
-
-          <form class="composer" id="composer" autocomplete="off">
-            <label class="sr-only" for="input">Message</label>
-            <textarea class="composer__input" id="input" rows="1" placeholder="Message Atlas" spellcheck="true"></textarea>
-            <div class="composer__bar">
-              <label class="composer__model">
-                <span>Model</span>
-                <select id="model"><option value="">Server default</option></select>
-              </label>
-              <span class="composer__hint">Enter to send · Shift+Enter for a new line</span>
-              <button class="btn btn--primary" id="send" type="submit">Transmit</button>
-              <button class="btn btn--stop" id="stop" type="button" hidden>Stop</button>
-            </div>
-          </form>
-        </section>
-      </main>
+          <div class="vital">
+            <dt>Context</dt>
+            <dd>
+              <span class="vital__value" id="v-ctx">0 / 8,192</span>
+              <span class="vital__meter" aria-hidden="true"><span id="v-ctx-fill"></span></span>
+            </dd>
+          </div>
+          <div class="vital">
+            <dt>Last reply</dt>
+            <dd><span class="vital__value" id="v-rate">—</span><span class="vital__sub" id="v-rate-sub">No reply yet</span></dd>
+          </div>
+          <div class="vital">
+            <dt>Link</dt>
+            <dd><span class="vital__value" id="v-link">—</span><span class="vital__sub" id="v-link-sub">Checking the backend</span></dd>
+          </div>
+        </dl>
+      </section>
     </div>
 
-    <!-- ============================================================
-         SYSTEMS DRAWER — telemetry + modules, out of the way until needed
-         ============================================================ -->
     <div class="scrim" id="scrim" hidden></div>
-    <aside class="drawer" id="drawer" aria-labelledby="drawer-title" aria-hidden="true" inert>
-      <header class="drawer__head">
-        <h2 class="drawer__title" id="drawer-title">Systems</h2>
-        <button class="icon-btn" id="drawer-close" type="button" aria-label="Close systems">
-          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15" /></svg>
-        </button>
-      </header>
-
-      <div class="tabs" role="tablist" aria-label="Systems views">
-        <button class="tab" id="tab-telemetry" role="tab" aria-selected="true" aria-controls="view-telemetry" type="button">Telemetry</button>
-        <button class="tab" id="tab-modules" role="tab" aria-selected="false" aria-controls="view-modules" type="button">
-          Modules <span class="tab__count" id="modules-count">0 / 10</span>
-        </button>
-      </div>
-
-      <div class="drawer__body">
-        <!-- Telemetry: real data only -->
-        <div class="view" id="view-telemetry" role="tabpanel" aria-labelledby="tab-telemetry">
-          <section class="panel" aria-labelledby="p-link">
-            <h3 class="panel__head" id="p-link">Link <span class="panel__sub">/api/health</span></h3>
-            <div class="big">
-              <span class="big__value" id="link-latency">—</span>
-              <span class="big__unit">ms</span>
-            </div>
-            <p class="panel__note" id="link-note">Backend round-trip, every 5 s</p>
-            <div class="bars" id="link-bars" aria-hidden="true"></div>
-          </section>
-
-          <section class="panel" aria-labelledby="p-stream">
-            <h3 class="panel__head" id="p-stream">Stream <span class="panel__sub panel__sub--text">last reply</span></h3>
-            <dl class="kv">
-              <div><dt>First token</dt><dd id="st-ttft">—</dd></div>
-              <div><dt>Rate</dt><dd id="st-rate">—</dd></div>
-              <div><dt>Duration</dt><dd id="st-dur">—</dd></div>
-              <div><dt>Chunks</dt><dd id="st-chunks">—</dd></div>
-            </dl>
-            <div class="bars bars--stream" id="st-bars" aria-hidden="true"></div>
-            <p class="panel__caption">Chunk arrival, last reply</p>
-            <p class="panel__note" id="st-note">Send a message to measure the model.</p>
-          </section>
-
-          <section class="panel" aria-labelledby="p-session">
-            <h3 class="panel__head" id="p-session">Session <span class="panel__sub panel__sub--text">in memory</span></h3>
-            <dl class="kv">
-              <div><dt>Messages</dt><dd id="ss-msgs">0</dd></div>
-              <div><dt>Uptime</dt><dd id="ss-uptime">00:00:00</dd></div>
-              <div>
-                <dt>Model</dt>
-                <dd><span class="chip chip--inline" id="chip-model" data-state="pending"><span class="chip__dot" aria-hidden="true"></span><span class="chip__value" id="chip-model-value">server default</span></span></dd>
-              </div>
-              <div><dt>Chat traffic</dt><dd><span id="traffic-in">In 0 B</span> · <span id="traffic-out">Out 0 B</span></dd></div>
-            </dl>
-            <div class="meter" aria-labelledby="ss-ctx-label">
-              <div class="meter__row">
-                <span id="ss-ctx-label">Context, estimated</span>
-                <span class="meter__value" id="ss-ctx">≈ 0 / 8,192</span>
-              </div>
-              <div class="meter__track"><div class="meter__fill" id="ss-ctx-fill"></div></div>
-            </div>
-          </section>
-
-          <section class="panel panel--waiting" aria-labelledby="p-hw">
-            <h3 class="panel__head" id="p-hw">Hardware <span class="panel__sub">/api/system</span></h3>
-            <dl class="kv">
-              <div><dt>CPU</dt><dd>—</dd></div>
-              <div><dt>RAM</dt><dd>—</dd></div>
-              <div><dt>GPU / VRAM</dt><dd>—</dd></div>
-              <div><dt>Logical cores</dt><dd id="hw-cores">—</dd></div>
-            </dl>
-            <p class="panel__note panel__note--warn">Awaiting link. Build a <code>/api/system</code> route in Phase 3 and these fill in.</p>
-          </section>
-        </div>
-
-        <!-- Modules: light up as their backend routes appear -->
-        <div class="view" id="view-modules" role="tabpanel" aria-labelledby="tab-modules" hidden>
-          <p class="view__intro">Each module comes online by itself when its route shows up in your backend. Amber means the route exists but still answers 501.</p>
-          <ul class="mods" id="modules-list"></ul>
-        </div>
-      </div>
-
-      <footer class="drawer__foot">
-        <span class="operator"><span class="operator__label">Operator</span> <span id="operator-name">Sigmar</span></span>
-        <span class="drawer__keys">
-          <button class="btn btn--link" id="reboot" type="button">Reboot</button>
-          <kbd>Alt</kbd><kbd>Shift</kbd><kbd>B</kbd>
-        </span>
-      </footer>
-    </aside>
 
     <script type="module" src="/static/js/app.js"></script>
   </body>
